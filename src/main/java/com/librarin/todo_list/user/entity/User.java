@@ -23,11 +23,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
     
-    @Column(length = 50)
-    private String firstName;
-    
-    @Column(length = 50)
-    private String lastName;
+    @Column(length = 100)
+    private String name;
     
     @Column(length = 20)
     private String phoneNumber;
