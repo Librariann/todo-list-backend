@@ -27,7 +27,7 @@ public class UserController {
      */
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponse>> registerUser(
-            @Valid @RequestBody UserRegistrationRequest request) {
+            @RequestBody UserRegistrationRequest request) {
         log.info("회원가입 API 호출: username={}", request.getUsername());
         
         UserResponse userResponse = userService.registerUser(request);
@@ -83,6 +83,17 @@ public class UserController {
                     .body(ApiResponse.error("사용자를 찾을 수 없습니다."));
         }
     }
+
+    /**
+     * 모든 활성 사용자 조회
+     */
+    @GetMapping("/active")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllActiveUsers() {
+        log.info("모든 활성 사용자 조회");
+
+        List<UserResponse> users = userService.findAllActiveUsers();
+        return ResponseEntity.ok(ApiResponse.success(users, "활성 사용자 목록 조회가 완료되었습니다."));
+    }
     
     /**
      * 사용자명으로 조회
@@ -100,16 +111,7 @@ public class UserController {
         }
     }
     
-    /**
-     * 모든 활성 사용자 조회
-     */
-    @GetMapping("/active")
-    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllActiveUsers() {
-        log.info("모든 활성 사용자 조회");
-        
-        List<UserResponse> users = userService.findAllActiveUsers();
-        return ResponseEntity.ok(ApiResponse.success(users, "활성 사용자 목록 조회가 완료되었습니다."));
-    }
+
     
     /**
      * 헬스 체크 엔드포인트
