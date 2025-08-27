@@ -28,4 +28,14 @@ public class JwtProperties {
      * Refresh Token 만료 시간 (밀리초)
      */
     private Long refreshExpiration;
+    
+    /**
+     * 쿠키 보안 설정 (HTTPS 전용)
+     */
+    private Boolean cookieSecure;
+    
+    /**
+     * 쿠키 SameSite 설정
+     */
+    private String cookieSameSite;
 }
