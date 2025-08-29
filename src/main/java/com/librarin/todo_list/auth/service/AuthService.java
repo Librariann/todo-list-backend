@@ -2,9 +2,12 @@ package com.librarin.todo_list.auth.service;
 
 import com.librarin.todo_list.auth.dto.LoginRequest;
 import com.librarin.todo_list.auth.dto.LoginResponse;
+import com.librarin.todo_list.security.jwt.JwtProperties;
 import com.librarin.todo_list.security.jwt.JwtTokenProvider;
 import com.librarin.todo_list.user.entity.User;
 import com.librarin.todo_list.user.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,38 +28,36 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtProperties jwtProperties;
     
     /**
      * 로그인 - JWT 토큰 발급
      */
-    public LoginResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request, HttpServletResponse response) {
         log.info("로그인 시도: username={}", request.getUsername());
         
-        // 사용자 조회
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + request.getUsername()));
         
-        // 비밀번호 검증
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다");
         }
         
-        // 사용자 상태 확인
         if (user.getStatus() != User.UserStatus.ACTIVE) {
             throw new BadCredentialsException("비활성화된 계정입니다");
         }
         
-        // JWT 토큰 생성
         String accessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
+        
+        setRefreshTokenCookie(response, refreshToken);
         
         log.info("로그인 성공: username={}", user.getUsername());
         
         return LoginResponse.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
                 .tokenType("Bearer")
-                .expiresIn(86400000L) // 24시간
+                .expiresIn(jwtProperties.getExpiration())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .build();
@@ -65,31 +66,38 @@ public class AuthService {
     /**
      * 토큰 갱신
      */
-    public LoginResponse refreshToken(String refreshToken) {
-        // 리프레시 토큰 검증
+    public LoginResponse refreshToken(String refreshToken, HttpServletResponse response) {
         if (!jwtTokenProvider.validateToken(refreshToken)) {
             throw new BadCredentialsException("유효하지 않은 리프레시 토큰입니다");
         }
         
-        // 토큰에서 사용자명 추출
         String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
         
-        // 사용자 조회
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
         
-        // 새로운 액세스 토큰 생성
         String newAccessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
+        
+        setRefreshTokenCookie(response, newRefreshToken);
         
         log.info("토큰 갱신 성공: username={}", user.getUsername());
         
         return LoginResponse.builder()
                 .accessToken(newAccessToken)
-                .refreshToken(refreshToken)
                 .tokenType("Bearer")
-                .expiresIn(86400000L)
+                .expiresIn(jwtProperties.getExpiration())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .build();
+    }
+    
+    private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(jwtProperties.getCookieSecure());
+        cookie.setPath("/");
+        cookie.setMaxAge((int) (jwtProperties.getRefreshExpiration() / 1000));
+        response.addCookie(cookie);
     }
 }
