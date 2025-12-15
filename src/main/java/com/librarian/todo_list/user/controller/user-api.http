@@ -1,0 +1,15 @@
+### 유저 조회
+GET http://localhost:8080/api/users/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### 유저 생성
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "name": "librarian",
+  "email": "test@test.com"
+}
