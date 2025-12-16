@@ -34,11 +34,11 @@ public class AuthService {
      * 로그인 - JWT 토큰 발급
      */
     public LoginResponse login(LoginRequest request) {
-        log.info("로그인 시도: username={}", request.getUsername());
+        log.info("로그인 시도: email={}", request.getEmail());
         
         // 사용자 조회
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + request.getUsername()));
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + request.getEmail()));
         
         // 비밀번호 검증
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -51,17 +51,17 @@ public class AuthService {
         }
         
         // JWT 토큰 생성
-        String accessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
         
-        log.info("로그인 성공: username={}", user.getUsername());
+        log.info("로그인 성공: username={}", user.getEmail());
         
         return LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(86400000L) // 24시간
-                .username(user.getUsername())
+                .nickname(user.getNickname())
                 .email(user.getEmail())
                 .build();
     }
@@ -76,23 +76,23 @@ public class AuthService {
         }
         
         // 토큰에서 사용자명 추출
-        String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
+        String username = jwtTokenProvider.getEmailFromToken(refreshToken);
         
         // 사용자 조회
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByNickname(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
         
         // 새로운 액세스 토큰 생성
-        String newAccessToken = jwtTokenProvider.generateAccessToken(user.getUsername());
+        String newAccessToken = jwtTokenProvider.generateAccessToken(user.getEmail());
         
-        log.info("토큰 갱신 성공: username={}", user.getUsername());
+        log.info("토큰 갱신 성공: username={}", user.getNickname());
         
         return LoginResponse.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(86400000L)
-                .username(user.getUsername())
+                .nickname(user.getNickname())
                 .email(user.getEmail())
                 .build();
     }
