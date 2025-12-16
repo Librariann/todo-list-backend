@@ -40,21 +40,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 토큰 유효성 검증
             if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
                 // 토큰에서 사용자명 추출
-                String username = jwtTokenProvider.getUsernameFromToken(jwt);
+                String username = jwtTokenProvider.getEmailFromToken(jwt);
                 
                 // 사용자 정보 조회
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
                 
                 // 인증 객체 생성
-                UsernamePasswordAuthenticationToken authentication = 
+                UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                                userDetails, 
-                                null, 
+                                userDetails,
+                                null,
                                 userDetails.getAuthorities()
                         );
-                
+
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                
+
                 // SecurityContext에 인증 정보 설정
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 
