@@ -39,44 +39,44 @@ public class JwtTokenProvider {
     }
     
     /**
-     * Access Token 생성 (username 기반)
+     * Access Token 생성 (email 기반)
      */
-    public String generateAccessToken(String username) {
-        return generateToken(username, jwtProperties.getExpiration());
+    public String generateAccessToken(String email) {
+        return generateToken(email, jwtProperties.getExpiration());
     }
     
     /**
      * Refresh Token 생성
      */
-    public String generateRefreshToken(String username) {
-        return generateToken(username, jwtProperties.getRefreshExpiration());
+    public String generateRefreshToken(String email) {
+        return generateToken(email, jwtProperties.getRefreshExpiration());
     }
     
     /**
      * JWT 토큰 생성
      */
-    private String generateToken(String username, Long expiration) {
+    private String generateToken(String email, Long expiration) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
         
         return Jwts.builder()
-                .subject(username)
+                .subject(email)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
     }
-    
+
     /**
-     * JWT 토큰에서 사용자명 추출
+     * JWT 토큰에서 사용자 Email 추출
      */
-    public String getUsernameFromToken(String token) {
+    public String getEmailFromToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        
+
         return claims.getSubject();
     }
     
