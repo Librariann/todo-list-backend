@@ -3,7 +3,7 @@ package com.librarian.todo_list.auth.controller;
 import com.librarian.todo_list.auth.dto.LoginRequest;
 import com.librarian.todo_list.auth.dto.LoginResponse;
 import com.librarian.todo_list.auth.service.AuthService;
-import com.librarian.todo_list.user.dto.ApiResponse;
+import com.librarian.todo_list.common.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
-        log.info("로그인 API 호출: username={}", request.getUsername());
+        log.info("로그인 API 호출: username={}", request.getEmail());
         
         LoginResponse loginResponse = authService.login(request);
         
