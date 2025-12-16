@@ -1,7 +1,7 @@
 package com.librarian.todo_list.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.librarian.todo_list.user.dto.ApiResponse;
+import com.librarian.todo_list.common.dto.ApiResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
