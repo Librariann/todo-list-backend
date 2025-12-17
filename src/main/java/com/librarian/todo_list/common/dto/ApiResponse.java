@@ -1,4 +1,4 @@
-package com.librarian.todo_list.user.dto;
+package com.librarian.todo_list.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
