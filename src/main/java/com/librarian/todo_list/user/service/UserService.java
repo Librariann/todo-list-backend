@@ -20,7 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserService {
-    
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     
@@ -29,24 +29,23 @@ public class UserService {
      */
     @Transactional
     public UserResponse registerUser(UserRegistrationRequest request) {
-        log.info("회원가입 요청: username={}, email={}", request.getUsername(), request.getEmail());
+        log.info("회원가입 요청: username={}, email={}", request.getNickname(), request.getEmail());
         
         // 비밀번호 일치 확인
         validatePasswordConfirmation(request.getPassword(), request.getConfirmPassword());
         
         // 중복 사용자 확인
-        validateUserUniqueness(request.getUsername(), request.getEmail());
+        validateUserUniqueness(request.getNickname(), request.getEmail());
         
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         
         // User 엔티티 생성
         User user = User.builder()
-                .username(request.getUsername())
+                .nickname(request.getNickname())
                 .email(request.getEmail())
                 .password(encodedPassword)
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
+                .name(request.getName())
                 .phoneNumber(request.getPhoneNumber())
                 .status(User.UserStatus.ACTIVE)
                 .role(User.UserRole.USER)
@@ -54,7 +53,7 @@ public class UserService {
         
         // 사용자 저장
         User savedUser = userRepository.save(user);
-        log.info("회원가입 완료: userId={}, username={}", savedUser.getId(), savedUser.getUsername());
+        log.info("회원가입 완료: userId={}, username={}", savedUser.getId(), savedUser.getNickname());
         
         return UserResponse.from(savedUser);
     }
@@ -62,8 +61,8 @@ public class UserService {
     /**
      * 사용자명으로 사용자 조회
      */
-    public Optional<UserResponse> findByUsername(String username) {
-        return userRepository.findByUsername(username)
+    public Optional<UserResponse> findByNickname(String username) {
+        return userRepository.findByNickname(username)
                 .map(UserResponse::from);
     }
     
@@ -96,8 +95,8 @@ public class UserService {
     /**
      * 사용자명 중복 확인
      */
-    public boolean isUsernameExists(String username) {
-        return userRepository.existsByUsername(username);
+    public boolean isnicknameExists(String username) {
+        return userRepository.existsByNickname(username);
     }
     
     /**
@@ -120,7 +119,7 @@ public class UserService {
      * 사용자 중복성 검증
      */
     private void validateUserUniqueness(String username, String email) {
-        if (userRepository.existsByUsername(username)) {
+        if (userRepository.existsByNickname(username)) {
             throw new UserAlreadyExistsException("이미 사용 중인 사용자명입니다: " + username);
         }
         
