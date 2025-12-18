@@ -8,9 +8,6 @@ import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
 
-/**
- * DTO for {@link Rewards}
- */
 @Value
 public class RewardsRegistrationRequest implements Serializable {
     @NotBlank
