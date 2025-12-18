@@ -6,15 +6,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    
+
     /**
      * 사용자명으로 사용자 조회
      */
-    Optional<User> findByUsername(String username);
+    Optional<User> findByNickname(String nickname);
     
     /**
      * 이메일로 사용자 조회
@@ -24,13 +25,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * 사용자명 또는 이메일로 사용자 조회
      */
-    @Query("SELECT u FROM User u WHERE u.username = :identifier OR u.email = :identifier")
-    Optional<User> findByUsernameOrEmail(@Param("identifier") String identifier);
+    @Query("SELECT u FROM User u WHERE u.nickname = :identifier OR u.email = :identifier")
+    Optional<User> findByNicknameOrEmail(@Param("identifier") String identifier);
     
     /**
      * 사용자명 존재 여부 확인
      */
-    boolean existsByUsername(String username);
+    boolean existsByNickname(String nickname);
     
     /**
      * 이메일 존재 여부 확인
@@ -46,6 +47,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * 사용자명과 이메일로 사용자 조회 (중복 검사용)
      */
-    @Query("SELECT u FROM User u WHERE u.username = :username OR u.email = :email")
-    Optional<User> findByUsernameOrEmailForDuplicateCheck(@Param("username") String username, @Param("email") String email);
+    @Query("SELECT u FROM User u WHERE u.nickname = :nickname OR u.email = :email")
+    Optional<User> findByNicknameOrEmailForDuplicateCheck(@Param("nickname") String nickname, @Param("email") String email);
 }
