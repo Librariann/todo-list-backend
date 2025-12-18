@@ -1,6 +1,8 @@
 package com.librarian.todo_list.user.entity;
 
 import com.librarian.todo_list.common.entity.BaseEntity;
+import com.librarian.todo_list.points.entity.UserPoint;
+import com.librarian.todo_list.rewards.entity.UserReward;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -17,9 +22,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class User extends BaseEntity {
-    
     @Column(unique = true, nullable = false, length = 50)
-    private String username;
+    private String nickname;
     
     @Column(unique = true, nullable = false, length = 100)
     private String email;
@@ -28,10 +32,7 @@ public class User extends BaseEntity {
     private String password;
     
     @Column(length = 50)
-    private String firstName;
-    
-    @Column(length = 50)
-    private String lastName;
+    private String name;
     
     @Column(length = 20)
     private String phoneNumber;
@@ -48,7 +49,7 @@ public class User extends BaseEntity {
 
     // 사용자 상태 열거형
     public enum UserStatus {
-        ACTIVE, INACTIVE, SUSPENDED
+        ACTIVE, INACTIVE, SUSPENDED, WITHDRAWN
     }
     
     // 사용자 역할 열거형
