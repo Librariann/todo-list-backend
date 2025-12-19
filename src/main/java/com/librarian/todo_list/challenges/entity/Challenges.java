@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Challenge extends BaseEntity {
+public class Challenges extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
