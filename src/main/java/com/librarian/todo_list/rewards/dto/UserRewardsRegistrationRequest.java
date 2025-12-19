@@ -9,18 +9,6 @@ import org.hibernate.validator.constraints.Length;
 import java.io.Serializable;
 
 @Value
-public class RewardsRegistrationRequest implements Serializable {
-    @NotBlank
-    @Length(min = 4, max = 50)
-    String name;
-
-    @NotNull
-    Rewards.RewardsType type;
-
-    @NotNull
-    Integer point;
-    String description;
-    Boolean discount;
-    Integer discountRate;
-    Boolean isActive;
+public class UserRewardsRegistrationRequest implements Serializable {
+    Long rewardId;
 }
