@@ -1,10 +1,12 @@
 package com.librarian.todo_list.rewards.entity;
 
 import com.librarian.todo_list.common.entity.BaseEntity;
-import com.librarian.todo_list.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "rewards")
@@ -13,17 +15,17 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Rewards extends BaseEntity {
+public class Reward extends BaseEntity {
     @Column(unique = true, nullable = false, length = 50)
     private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     @Builder.Default
-    private Rewards.RewardsType type = RewardsType.POINT;
+    private Reward.RewardsType type = RewardsType.POINT;
 
     @Column(nullable = false)
-    private int point;
+    private Integer point;
 
     @Column(nullable = false, length = 50)
     private String description;
@@ -34,11 +36,11 @@ public class Rewards extends BaseEntity {
 
     @Column(nullable = false)
     @Builder.Default
-    private int discount_rate = 0;
+    private Integer discountRate = 0;
 
     @Column(nullable = false)
     @Builder.Default
-    private boolean is_active = true;
+    private boolean isActive = true;
 
     // 사용자 상태 열거형
     public enum RewardsType {
