@@ -1,6 +1,6 @@
 package com.librarian.todo_list.user.controller;
 
-import com.librarian.todo_list.user.dto.ApiResponse;
+import com.librarian.todo_list.common.dto.ApiResponse;
 import com.librarian.todo_list.user.dto.UserRegistrationRequest;
 import com.librarian.todo_list.user.dto.UserResponse;
 import com.librarian.todo_list.user.service.UserService;
@@ -28,7 +28,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponse>> registerUser(
             @Valid @RequestBody UserRegistrationRequest request) {
-        log.info("회원가입 API 호출: username={}", request.getUsername());
+        log.info("회원가입 API 호출: username={}", request.getNickname());
         
         UserResponse userResponse = userService.registerUser(request);
         
@@ -40,11 +40,11 @@ public class UserController {
      * 사용자명 중복 확인
      */
     @GetMapping("/check-username/{username}")
-    public ResponseEntity<ApiResponse<Boolean>> checkUsernameAvailability(
+    public ResponseEntity<ApiResponse<Boolean>> checknicknameAvailability(
             @PathVariable String username) {
         log.info("사용자명 중복 확인: {}", username);
         
-        boolean isAvailable = !userService.isUsernameExists(username);
+        boolean isAvailable = !userService.isnicknameExists(username);
         String message = isAvailable ? 
                 "사용 가능한 사용자명입니다." : 
                 "이미 사용 중인 사용자명입니다.";
@@ -88,10 +88,10 @@ public class UserController {
      * 사용자명으로 조회
      */
     @GetMapping("/username/{username}")
-    public ResponseEntity<ApiResponse<UserResponse>> getUserByUsername(@PathVariable String username) {
+    public ResponseEntity<ApiResponse<UserResponse>> getUserByNickname(@PathVariable String username) {
         log.info("사용자명으로 조회: username={}", username);
         
-        Optional<UserResponse> user = userService.findByUsername(username);
+        Optional<UserResponse> user = userService.findByNickname(username);
         if (user.isPresent()) {
             return ResponseEntity.ok(ApiResponse.success(user.get(), "사용자 조회가 완료되었습니다."));
         } else {
