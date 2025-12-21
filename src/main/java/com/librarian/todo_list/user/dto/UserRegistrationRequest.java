@@ -16,11 +16,16 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class UserRegistrationRequest {
-    
-    @NotBlank(message = "사용자명은 필수입니다")
-    @Size(min = 3, max = 50, message = "사용자명은 3자 이상 50자 이하여야 합니다")
-    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "사용자명은 영문, 숫자, 언더스코어만 사용 가능합니다")
-    private String username;
+
+    @NotBlank(message = "닉네임은 필수입니다")
+    @Size(min = 3, max = 50, message = "닉네임은 3자 이상 50자 이하여야 합니다")
+    @Pattern(regexp = "^[a-zA-Z0-9_]+$", message = "닉네임은 영문, 숫자, 언더스코어만 사용 가능합니다")
+    private String nickname;
+
+    @NotBlank(message = "유저명은 필수입니다")
+    @Size(min = 3, max = 50, message = "유저명은 3자 이상 50자 이하여야 합니다")
+    @Pattern(regexp = "^[a-zA-Z가-힣]+$", message = "유저명은 영문, 한글만 사용 가능합니다")
+    private String name;
     
     @NotBlank(message = "이메일은 필수입니다")
     @Email(message = "올바른 이메일 형식이 아닙니다")
@@ -42,6 +47,6 @@ public class UserRegistrationRequest {
     @Size(max = 50, message = "성은 50자 이하여야 합니다")
     private String lastName;
     
-    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$|^$", message = "올바른 전화번호 형식이 아닙니다")
+    @Pattern(regexp = "^01(?:0|1|[6-9])(?:\\d{3,4})\\d{4}$|^$", message = "올바른 전화번호 형식이 아닙니다 (예: 01012345678)")
     private String phoneNumber;
 }
