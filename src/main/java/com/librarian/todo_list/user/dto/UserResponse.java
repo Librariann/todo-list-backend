@@ -17,10 +17,9 @@ import java.time.LocalDateTime;
 public class UserResponse {
     
     private Long id;
-    private String username;
+    private String nickname;
     private String email;
-    private String firstName;
-    private String lastName;
+    private String name;
     private String phoneNumber;
     private User.UserStatus status;
     private User.UserRole role;
@@ -33,10 +32,9 @@ public class UserResponse {
     public static UserResponse from(User user) {
         return UserResponse.builder()
                 .id(user.getId())
-                .username(user.getUsername())
+                .nickname(user.getNickname())
                 .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
+                .name(user.getName())
                 .phoneNumber(user.getPhoneNumber())
                 .status(user.getStatus())
                 .role(user.getRole())
