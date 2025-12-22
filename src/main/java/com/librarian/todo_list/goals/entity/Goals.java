@@ -16,7 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Goal extends BaseEntity {
+public class Goals extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -31,12 +31,14 @@ public class Goal extends BaseEntity {
     private UserPoint.PeriodTypeStatus recurrence_type;
 
     @Column(nullable = false)
+    @Builder.Default
     private Integer interval = 1;
 
     @Column(nullable = false)
     private Date startDate;
 
     @Column(nullable = false)
+    @Builder.Default
     private Integer targetCount = 1;
 
     @Column(nullable = false)
