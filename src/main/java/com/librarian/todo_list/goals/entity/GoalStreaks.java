@@ -1,4 +1,32 @@
 package com.librarian.todo_list.goals.entity;
 
-public class GoalStreaks {
+import com.librarian.todo_list.common.entity.BaseEntity;
+import com.librarian.todo_list.user.entity.User;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+
+@Entity
+@Table(name = "goal_streaks")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
+public class GoalStreaks extends BaseEntity {
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "goals_id", nullable = false)
+    private Goals goals;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer currentStreak = 0;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer longestStreak = 0;
 }
