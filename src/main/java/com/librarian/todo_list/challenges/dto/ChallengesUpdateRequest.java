@@ -1,18 +1,20 @@
-package com.librarian.todo_list.rewards.dto;
+package com.librarian.todo_list.challenges.dto;
 
+import com.librarian.todo_list.points.entity.UserPoint;
 import com.librarian.todo_list.rewards.entity.Rewards;
+import jakarta.validation.constraints.NotNull;
 import lombok.Value;
 import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
 
 @Value
-public class RewardsUpdateRequest implements Serializable {
+public class ChallengesUpdateRequest implements Serializable {
     @Length(min = 4, max = 50)
     String name;
-    Rewards.RewardsType type;
-    Integer point;
     String description;
-    Boolean discount;
-    Integer discountRate;
+    String icon;
+    UserPoint.PeriodTypeStatus recurrenceType;
+    Integer targetCount;
+    Integer point;
 }
