@@ -1,5 +1,6 @@
 package com.librarian.todo_list.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonFormat
 public class ApiResponse<T> {
     
     private boolean success;
