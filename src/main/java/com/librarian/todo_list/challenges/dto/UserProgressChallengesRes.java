@@ -1,9 +1,7 @@
 package com.librarian.todo_list.challenges.dto;
 
-import com.librarian.todo_list.challenges.entity.Challenges;
+import com.librarian.todo_list.challenges.entity.UserProgressChallenges;
 import com.librarian.todo_list.points.entity.UserPoint;
-import com.librarian.todo_list.rewards.entity.Rewards;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -13,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChallengesResponse {
+public class UserProgressChallengesRes {
 
     private Long id;
     private LocalDateTime createdAt;
@@ -28,18 +26,11 @@ public class ChallengesResponse {
     /**
      * Rewards 엔티티를 Response DTO로 변환하는 정적 메서드
      */
-    public static ChallengesResponse from(Challenges challenges) {
-        return ChallengesResponse.builder()
-                .id(challenges.getId())
-                .createdAt(challenges.getCreatedAt())
-                .updatedAt(challenges.getUpdatedAt())
-                .name(challenges.getName())
-                .description(challenges.getDescription())
-                .icon(challenges.getIcon())
-                .recurrenceType(challenges.getRecurrenceType())
-                .targetCount(challenges.getTargetCount())
-                .point(challenges.getPoint())
-                .isActive(challenges.isActive())
+    public static UserProgressChallengesRes from(UserProgressChallenges progress) {
+        return UserProgressChallengesRes.builder()
+                .id(progress.getId())
+                .createdAt(progress.getCreatedAt())
+                .updatedAt(progress.getUpdatedAt())
                 .build();
     }
 }
