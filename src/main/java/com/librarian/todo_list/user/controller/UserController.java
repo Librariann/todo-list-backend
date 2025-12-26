@@ -29,7 +29,7 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserResponse>> registerUser(
             @Valid @RequestBody UserRegistrationRequest request) {
         log.info("회원가입 API 호출: username={}", request.getNickname());
-        
+
         UserResponse userResponse = userService.registerUser(request);
         
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -44,7 +44,7 @@ public class UserController {
             @PathVariable String username) {
         log.info("사용자명 중복 확인: {}", username);
         
-        boolean isAvailable = !userService.isnicknameExists(username);
+        boolean isAvailable = !userService.isNicknameExists(username);
         String message = isAvailable ? 
                 "사용 가능한 사용자명입니다." : 
                 "이미 사용 중인 사용자명입니다.";
