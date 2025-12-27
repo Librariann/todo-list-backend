@@ -16,8 +16,8 @@ public interface ChallengesRepository extends JpaRepository<Challenges, Long> {
     boolean existsByName(String name);
     boolean existsByNameAndIsActiveTrueAndIdNot(String name, Long id);
     //GetList Active true
-    List<Rewards> findByIsActiveTrue();
+    List<Challenges> findByIsActiveTrue();
 
     //GetOne Active true
-    Optional<Rewards> findByIdAndIsActiveTrue(Long id);
+    Optional<Challenges> findByIdAndIsActiveTrue(Long id);
 }
