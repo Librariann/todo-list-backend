@@ -75,12 +75,12 @@ public class AuthService {
             throw new BadCredentialsException("유효하지 않은 리프레시 토큰입니다");
         }
         
-        // 토큰에서 사용자명 추출
-        String username = jwtTokenProvider.getEmailFromToken(refreshToken);
+        // 토큰에서 사용자 이메일 추출
+        String email = jwtTokenProvider.getEmailFromToken(refreshToken);
         
         // 사용자 조회
-        User user = userRepository.findByNickname(username)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
         
         // 새로운 액세스 토큰 생성
         String newAccessToken = jwtTokenProvider.generateAccessToken(user.getEmail());
