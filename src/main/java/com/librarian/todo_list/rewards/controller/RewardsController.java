@@ -3,6 +3,7 @@ package com.librarian.todo_list.rewards.controller;
 import com.librarian.todo_list.common.dto.ApiResponse;
 import com.librarian.todo_list.rewards.dto.RewardsRegistrationRequest;
 import com.librarian.todo_list.rewards.dto.RewardsResponse;
+import com.librarian.todo_list.rewards.dto.RewardsUpdateRequest;
 import com.librarian.todo_list.rewards.service.RewardsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -51,17 +52,17 @@ public class RewardsController {
                 .body(ApiResponse.success(rewardResponse, "보상이 성공적으로 등록 완료되었습니다."));
     }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<ApiResponse> updateReward(
-//            @Valid @RequestBody RewardsRegistrationRequest request,
-//            @PathVariable Long id ) {
-//        log.info("상품 수정 API 호출: name={}", request.getName());
-//
-//        RewardsResponse rewardResponse = rewardsService.updateRewards(request, id);
-//
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(ApiResponse.success(rewardResponse, "보상이 성공적으로 수정 완료되었습니다."));
-//    }
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse> updateReward(
+            @Valid @RequestBody RewardsUpdateRequest request,
+            @PathVariable Long id ) {
+        log.info("상품 수정 API 호출: name={}", request.getName());
+
+        RewardsResponse rewardResponse = rewardsService.updateRewards(request, id);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(rewardResponse, "보상이 성공적으로 수정 완료되었습니다."));
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<RewardsResponse>> deleteReward(@PathVariable Long id) {
