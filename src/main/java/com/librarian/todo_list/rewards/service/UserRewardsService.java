@@ -2,15 +2,18 @@ package com.librarian.todo_list.rewards.service;
 
 import com.librarian.todo_list.exception.CommonAlreadyExistsException;
 import com.librarian.todo_list.rewards.dto.RewardsRegistrationRequest;
-import com.librarian.todo_list.rewards.dto.RewardsResponse;
+import com.librarian.todo_list.rewards.dto.UserRewardsRegistrationRequest;
+import com.librarian.todo_list.rewards.dto.UserRewardsResponse;
 import com.librarian.todo_list.rewards.dto.RewardsUpdateRequest;
 import com.librarian.todo_list.rewards.entity.Rewards;
+import com.librarian.todo_list.rewards.entity.UserReward;
 import com.librarian.todo_list.rewards.repository.RewardsRepository;
+import com.librarian.todo_list.rewards.repository.UserRewardsRepository;
+import com.librarian.todo_list.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 import java.util.List;
 
@@ -18,96 +21,47 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RewardsService {
+public class UserRewardsService {
 
+    private final UserRewardsRepository userRewardsRepository;
     private final RewardsRepository rewardsRepository;
-
     //get list
-    public List<RewardsResponse> getRewards() {
-        return rewardsRepository.findByIsActiveTrue()
+    public List<UserRewardsResponse> getUserRewards() {
+        return userRewardsRepository.findByIsUsedTrue()
                 .stream()
-                .map(RewardsResponse::from)
+                .map(UserRewardsResponse::from)
                 .toList();
     }
 
-    //get list One
-    public RewardsResponse getOneReward(Long id) {
-        RewardsResponse rewards = rewardsRepository.findById(id)
-                .map(RewardsResponse::from)
-                .orElseThrow(() -> new IllegalArgumentException("보상을 찾을 수 없습니다."));
-
-        if(!rewards.getIsActive()){
-            throw new IllegalArgumentException("삭제된 보상 입니다.");
-        }
-
-        return rewards;
-    }
-
     @Transactional
-    public RewardsResponse registerRewards(RewardsRegistrationRequest request) {
-        log.info("보상 목록 등록 요청: name={}", request.getName());
+    public UserRewardsResponse redeemUserRewards(Long rewardId , User user) {
 
-        // 중복 보상명 확인
-        validateRewardsUniqueness(request.getName());
+        Rewards reward = rewardsRepository.findById(rewardId)
+                .orElseThrow(() -> new IllegalArgumentException("보상을 찾을 수 없습니다: " + rewardId));
+
 
         // create Rewards Entity
-        Rewards rewards = Rewards.builder()
-                .name(request.getName())
-                .type(request.getType())
-                .point(request.getPoint())
-                .description(request.getDescription())
-                .discount(request.getDiscount())
-                .discountRate(request.getDiscountRate())
-                .isActive(request.getIsActive())
+        UserReward userRewards = UserReward.builder()
+                .user(user)
+                .rewards(reward)
                 .build();
 
         // 사용자 저장
-        Rewards savedRewards = rewardsRepository.save(rewards);
-        return RewardsResponse.from(savedRewards);
+        UserReward savedRewards = userRewardsRepository.save(userRewards);
+        return UserRewardsResponse.from(savedRewards);
     }
 
     // 수정
     @Transactional
-    public RewardsResponse updateRewards(RewardsUpdateRequest request, Long id) {
-        log.info("보상 수정 요청: id={}", id);
-
-        Rewards getReward = rewardsRepository.findByIdAndIsActiveTrue(id)
+    public UserRewardsResponse useUserRewards(Long id) {
+        UserReward getUserReward = userRewardsRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("보상을 찾을 수 없습니다: " + id));
 
-        if(request.getName() != null
-                && !request.getName().isBlank()
-                && rewardsRepository.existsByNameAndIsActiveTrueAndIdNot(request.getName(), id)) {
-            // 중복 보상명 확인
-            throw new CommonAlreadyExistsException("이미 사용중인 보상명 입니다: " + request.getName());
+        if(!getUserReward.isUsed()){
+            return UserRewardsResponse.from(getUserReward);
         }
+        getUserReward.setUsed(true);
 
-        getReward.update(request);
-
-        return RewardsResponse.from(getReward);
-    }
-
-    // 삭제
-    @Transactional
-    public RewardsResponse deleteRewards(Long id) {
-        log.info("보상 삭제 요청: id={}", id);
-
-        Rewards getReward = rewardsRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("보상을 찾을 수 없습니다: " + id));
-
-        if(!getReward.isActive()){
-            return RewardsResponse.from(getReward);
-        }
-        getReward.setActive(false);
-
-        return RewardsResponse.from(getReward);
-
-    }
-    /**
-     * 이미 사용중인 Reward 확인 (전체)
-     */
-    private void validateRewardsUniqueness(String name) {
-        if (rewardsRepository.existsByName(name)) {
-            throw new CommonAlreadyExistsException("이미 사용중인 보상명 입니다: " + name);
-        }
+        return UserRewardsResponse.from(getUserReward);
     }
 }
