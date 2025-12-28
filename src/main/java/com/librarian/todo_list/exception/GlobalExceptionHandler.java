@@ -35,7 +35,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage()));
     }
-    
+
+
+    /**
+     * 중복 예외처리
+     */
+    @ExceptionHandler(CommonAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<Object>> handleCommonAlreadyExists(CommonAlreadyExistsException ex) {
+        log.warn("already exists: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
     /**
      * 유효성 검증 실패 예외 처리
      */
@@ -53,7 +64,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error("입력값 검증에 실패했습니다.", errors));
     }
-    
+
+    // 비활성화, 사용불가
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.error("Runtime exception occurred: ", ex);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
     /**
      * 일반적인 런타임 예외 처리
      */
