@@ -1,6 +1,9 @@
 package com.librarian.todo_list.challenges.service;
 
+import com.librarian.todo_list.challenges.dto.ChallengesRegistrationRequest;
 import com.librarian.todo_list.challenges.dto.ChallengesResponse;
+import com.librarian.todo_list.challenges.dto.ChallengesUpdateRequest;
+import com.librarian.todo_list.challenges.entity.Challenges;
 import com.librarian.todo_list.challenges.repository.ChallengesRepository;
 import com.librarian.todo_list.exception.CommonAlreadyExistsException;
 import com.librarian.todo_list.rewards.dto.RewardsRegistrationRequest;
@@ -32,43 +35,43 @@ public class ChallengesService {
 
     //get list One
     public ChallengesResponse getOneChallenges(Long id) {
-        ChallengesResponse rewards = challengesRepository.findById(id)
+        ChallengesResponse challenges = challengesRepository.findById(id)
                 .map(ChallengesResponse::from)
                 .orElseThrow(() -> new IllegalArgumentException("보상을 찾을 수 없습니다."));
 
-        if(!rewards.getIsActive()){
+        if(!challenges.getIsActive()){
             throw new IllegalArgumentException("삭제된 보상 입니다.");
         }
 
-        return rewards;
+        return challenges;
     }
 
     @Transactional
-    public RewardsResponse registerChallenges(RewardsRegistrationRequest request) {
+    public ChallengesResponse registerChallenges(ChallengesRegistrationRequest request) {
         // 중복 보상명 확인
         validateRewardsUniqueness(request.getName());
 
         // create Rewards Entity
-        Rewards rewards = Rewards.builder()
+        Challenges rewards = Challenges.builder()
                 .name(request.getName())
-                .type(request.getType())
-                .point(request.getPoint())
+                .recurrenceType(request.getRecurrenceType())
                 .description(request.getDescription())
-                .discount(request.getDiscount())
-                .discountRate(request.getDiscountRate())
-                .isActive(request.getIsActive())
+                .icon(request.getIcon())
+                .targetCount(request.getTargetCount())
+                .point(request.getPoint())
+                .isActive(request.isActive())
                 .build();
 
         // 사용자 저장
-        Rewards savedRewards = challengesRepository.save(rewards);
-        return RewardsResponse.from(savedRewards);
+        Challenges savedChallenges = challengesRepository.save(rewards);
+        return ChallengesResponse.from(savedChallenges);
     }
 
     // 수정
     @Transactional
-    public RewardsResponse updateChallenges(RewardsUpdateRequest request, Long id) {
-        Rewards getReward = challengesRepository.findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new IllegalArgumentException("보상을 찾을 수 없습니다: " + id));
+    public ChallengesResponse updateChallenges(ChallengesUpdateRequest request, Long id) {
+        Challenges getChallenges = challengesRepository.findByIdAndIsActiveTrue(id)
+                .orElseThrow(() -> new IllegalArgumentException("도전과제를 찾을 수 없습니다: " + id));
 
         if(request.getName() != null
                 && !request.getName().isBlank()
@@ -77,23 +80,23 @@ public class ChallengesService {
             throw new CommonAlreadyExistsException("이미 사용중인 보상명 입니다: " + request.getName());
         }
 
-        getReward.update(request);
+        getChallenges.update(request);
 
-        return RewardsResponse.from(getReward);
+        return ChallengesResponse.from(getChallenges);
     }
 
     // 삭제
     @Transactional
-    public RewardsResponse deleteRewards(Long id) {
-        Rewards getReward = challengesRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("보상을 찾을 수 없습니다: " + id));
+    public ChallengesResponse deleteChallenges(Long id) {
+        Challenges getChallenges = challengesRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("도전과제를 찾을 수 없습니다: " + id));
 
-        if(!getReward.isActive()){
-            return RewardsResponse.from(getReward);
+        if(!getChallenges.isActive()){
+            return ChallengesResponse.from(getChallenges);
         }
-        getReward.setActive(false);
+        getChallenges.setActive(false);
 
-        return RewardsResponse.from(getReward);
+        return ChallengesResponse.from(getChallenges);
 
     }
     /**
