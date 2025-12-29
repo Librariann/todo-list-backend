@@ -1,4 +1,21 @@
 ### health Check
-
 GET http://localhost:8080/api/users/health
 Accept: application/json
+
+### register
+POST http://localhost:8080/api/users/register
+Content-Type: application/json
+
+{
+  "nickname": "librarian",
+  "name": "박성현",
+  "email": "okpc0305@gmail.com",
+  "password": "Tjdgus123!",
+  "confirmPassword": "Tjdgus123!",
+  "phoneNumber": "01055125911",
+  "role": "ADMIN"
+}
+
+### Get Me
+GET http://localhost:8080/api/users/active
+Authorization: Bearer {{access_token}}
