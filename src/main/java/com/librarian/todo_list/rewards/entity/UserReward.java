@@ -24,5 +24,5 @@ public class UserReward extends BaseEntity {
 
     @Column(nullable = false)
     @Builder.Default
-    private boolean isActive = false;
+    private boolean isUsed = false;
 }
