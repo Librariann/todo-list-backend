@@ -1,5 +1,6 @@
 package com.librarian.todo_list.rewards.controller;
 
+import com.librarian.todo_list.challenges.controller.UserProgressChallengesController;
 import com.librarian.todo_list.common.dto.ApiResponse;
 import com.librarian.todo_list.rewards.dto.*;
 import com.librarian.todo_list.rewards.service.RewardsService;
