@@ -48,7 +48,7 @@ public class UserService {
                 .name(request.getName())
                 .phoneNumber(request.getPhoneNumber())
                 .status(User.UserStatus.ACTIVE)
-                .role(User.UserRole.USER)
+                .role(request.getRole())
                 .build();
         
         // 사용자 저장
@@ -95,7 +95,7 @@ public class UserService {
     /**
      * 사용자명 중복 확인
      */
-    public boolean isnicknameExists(String username) {
+    public boolean isNicknameExists(String username) {
         return userRepository.existsByNickname(username);
     }
     
