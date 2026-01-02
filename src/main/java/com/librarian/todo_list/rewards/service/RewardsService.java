@@ -73,7 +73,6 @@ public class RewardsService {
         if(request.getName() != null
                 && !request.getName().isBlank()
                 && rewardsRepository.existsByNameAndIsActiveTrueAndIdNot(request.getName(), id)) {
-            // 중복 보상명 확인
             throw new CommonAlreadyExistsException("이미 사용중인 보상명 입니다: " + request.getName());
         }
 
