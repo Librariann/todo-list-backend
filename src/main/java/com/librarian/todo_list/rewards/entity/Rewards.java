@@ -5,9 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "rewards")
 @Getter
@@ -15,14 +12,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Reward extends BaseEntity {
-    @Column(unique = true, nullable = false, length = 50)
+public class Rewards extends BaseEntity {
+    @Column(nullable = false, length = 50)
     private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     @Builder.Default
-    private Reward.RewardsType type = RewardsType.POINT;
+    private Rewards.RewardsType type = RewardsType.POINT;
 
     @Column(nullable = false)
     private Integer point;
