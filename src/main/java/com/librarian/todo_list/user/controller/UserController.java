@@ -1,6 +1,7 @@
 package com.librarian.todo_list.user.controller;
 
 import com.librarian.todo_list.common.dto.ApiResponse;
+import com.librarian.todo_list.security.CustomUserDetails;
 import com.librarian.todo_list.user.dto.UserRegistrationRequest;
 import com.librarian.todo_list.user.dto.UserResponse;
 import com.librarian.todo_list.user.service.UserService;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,7 +38,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(userResponse, "회원가입이 성공적으로 완료되었습니다."));
     }
-    
+
+    /**
+     * 사용자 정보 수정
+     */
+
     /**
      * 사용자명 중복 확인
      */
@@ -117,5 +124,13 @@ public class UserController {
     @GetMapping("/health")
     public ResponseEntity<ApiResponse<String>> healthCheck() {
         return ResponseEntity.ok(ApiResponse.success("OK", "사용자 서비스가 정상적으로 동작 중입니다."));
+    }
+
+    /**
+     * 본인 information
+     */
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> me(@AuthenticationPrincipal CustomUserDetails principal) {
+        return ResponseEntity.ok(ApiResponse.success(UserResponse.from(principal.getUser()), "내 정보 조회"));
     }
 }
