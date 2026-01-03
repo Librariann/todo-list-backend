@@ -20,7 +20,7 @@ public class UserReward extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "reward_id", nullable = false)
-    private Reward reward;
+    private Rewards rewards;
 
     @Column(nullable = false)
     @Builder.Default
