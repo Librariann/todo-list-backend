@@ -1,107 +1,88 @@
-package com.librarian.todo_list.rewards.service;
+package com.librarian.todo_list.todos.service;
 
 import com.librarian.todo_list.exception.CommonAlreadyExistsException;
-import com.librarian.todo_list.rewards.dto.RewardsRegistrationRequest;
-import com.librarian.todo_list.rewards.dto.RewardsResponse;
-import com.librarian.todo_list.rewards.dto.RewardsUpdateRequest;
-import com.librarian.todo_list.rewards.entity.Rewards;
-import com.librarian.todo_list.rewards.repository.RewardsRepository;
+import com.librarian.todo_list.todos.dto.TodosRegistrationRequest;
+import com.librarian.todo_list.todos.dto.TodosResponse;
+import com.librarian.todo_list.todos.dto.TodosUpdateRequest;
+import com.librarian.todo_list.todos.entity.Todos;
+import com.librarian.todo_list.todos.repository.TodosRepository;
+import com.librarian.todo_list.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RewardsService {
+public class TodosService {
 
-    private final RewardsRepository rewardsRepository;
+    private final TodosRepository todosRepository;
 
     //get list
-    public List<RewardsResponse> getRewards() {
-        return rewardsRepository.findByIsActiveTrue()
+    public List<TodosResponse> getTodos() {
+        return todosRepository.findAll()
                 .stream()
-                .map(RewardsResponse::from)
+                .map(TodosResponse::from)
                 .toList();
     }
 
-    //get list One
-    public RewardsResponse getOneReward(Long id) {
-        RewardsResponse rewards = rewardsRepository.findById(id)
-                .map(RewardsResponse::from)
-                .orElseThrow(() -> new IllegalArgumentException("보상을 찾을 수 없습니다."));
-
-        if(!rewards.getIsActive()){
-            throw new IllegalArgumentException("삭제된 보상 입니다.");
-        }
-
-        return rewards;
-    }
-
     @Transactional
-    public RewardsResponse registerRewards(RewardsRegistrationRequest request) {
-        // 중복 보상명 확인
-        validateRewardsUniqueness(request.getName());
+    public TodosResponse registerTodos(TodosRegistrationRequest request, User user) {
+        Optional<Todos> max = todosRepository.findTopByUserAndTargetDateOrderByOrderIndexDesc(user, request.getTargetDate());
 
-        // create Rewards Entity
-        Rewards rewards = Rewards.builder()
+        // 중복 할 일 확인
+        validateTodosUniqueness(request.getName());
+        int orderIndex = max.map(Todos::getOrderIndex).orElse(0) + 1;
+        // create Todos Entity
+        Todos todos = Todos.builder()
                 .name(request.getName())
-                .type(request.getType())
-                .point(request.getPoint())
-                .description(request.getDescription())
-                .discount(request.getDiscount())
-                .discountRate(request.getDiscountRate())
-                .isActive(request.getIsActive())
+                .user(user)
+                .status(Todos.TodosStatus.READY)
+                .orderIndex(orderIndex)
+                .targetDate(request.getTargetDate())
                 .build();
 
         // 사용자 저장
-        Rewards savedRewards = rewardsRepository.save(rewards);
-        return RewardsResponse.from(savedRewards);
+        Todos savedTodos = todosRepository.save(todos);
+        return TodosResponse.from(savedTodos);
     }
 
     // 수정
     @Transactional
-    public RewardsResponse updateRewards(RewardsUpdateRequest request, Long id) {
-        Rewards getReward = rewardsRepository.findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new IllegalArgumentException("보상을 찾을 수 없습니다: " + id));
+    public TodosResponse updateTodos(TodosUpdateRequest request, Long id, User user) {
+        Todos getTodos = todosRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("할 일을 찾을 수 없습니다: " + id));
 
         if(request.getName() != null
                 && !request.getName().isBlank()
-                && rewardsRepository.existsByNameAndIsActiveTrueAndIdNot(request.getName(), id)) {
-            // 중복 보상명 확인
-            throw new CommonAlreadyExistsException("이미 사용중인 보상명 입니다: " + request.getName());
+                && todosRepository.existsByNameAndIdNot(request.getName(), id)
+        ) {
+            throw new CommonAlreadyExistsException("이미 사용중인 할 일명 입니다: " + request.getName());
         }
 
-        getReward.update(request);
+        getTodos.update(request);
 
-        return RewardsResponse.from(getReward);
+        return TodosResponse.from(getTodos);
     }
 
     // 삭제
     @Transactional
-    public RewardsResponse deleteRewards(Long id) {
-        Rewards getReward = rewardsRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("보상을 찾을 수 없습니다: " + id));
-
-        if(!getReward.isActive()){
-            return RewardsResponse.from(getReward);
-        }
-        getReward.setActive(false);
-
-        return RewardsResponse.from(getReward);
-
+    public void deleteTodos(Long id, User user) {
+        Todos getTodos = todosRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("할 일을 찾을 수 없습니다: " + id));
+        todosRepository.delete(getTodos);
     }
     /**
-     * 이미 사용중인 Reward 확인 (전체)
+     * 이미 사용중인 Todos 확인
      */
-    private void validateRewardsUniqueness(String name) {
-        if (rewardsRepository.existsByName(name)) {
-            throw new CommonAlreadyExistsException("이미 사용중인 보상명 입니다: " + name);
+    private void validateTodosUniqueness(String name) {
+        if (todosRepository.existsByName(name)) {
+            throw new CommonAlreadyExistsException("이미 사용중인 할 일 입니다: " + name);
         }
     }
 }
