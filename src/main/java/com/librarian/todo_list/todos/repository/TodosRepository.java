@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface TodosRepository extends JpaRepository<Todos, Long> {
+    List<Todos> findByUserIdAndTargetDate(Long userId, LocalDate targetDate);
     boolean existsByName(String name);
     Optional<Todos> findTopByUserAndTargetDateOrderByOrderIndexDesc(User user, LocalDate targetDate);
     boolean existsByNameAndIdNot(String name, Long id);
