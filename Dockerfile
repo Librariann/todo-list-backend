@@ -5,8 +5,13 @@ COPY . .
 RUN gradle build -x test --no-daemon
 
 # Runtime stage
-FROM eclipse-temurin:24-jre-jammy
+FROM eclipse-temurin:24-jre
 WORKDIR /app
+
+# curl for HEALTHCHECK
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends curl \
+  && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security
 RUN groupadd -r appuser && useradd --no-log-init -r -g appuser appuser
@@ -20,10 +25,7 @@ USER appuser
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:8080/api/users/health || exit 1
+  CMD curl -fsS http://localhost:8080/api/users/health || exit 1
 
-# Expose port
 EXPOSE 8080
-
-# Run the application
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
