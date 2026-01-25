@@ -1,1 +1,0 @@
-ALTER TABLE user_rewards RENAME COLUMN is_active TO is_used;
