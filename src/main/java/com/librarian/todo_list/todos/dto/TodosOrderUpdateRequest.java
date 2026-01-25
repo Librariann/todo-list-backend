@@ -1,18 +1,26 @@
 package com.librarian.todo_list.todos.dto;
 
-import com.librarian.todo_list.rewards.entity.Rewards;
-import com.librarian.todo_list.todos.entity.Todos;
-import com.librarian.todo_list.user.entity.User;
-import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Value;
-import org.hibernate.validator.constraints.Length;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
-@Value
-public class TodosUpdateRequest implements Serializable {
-    String name;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class TodosOrderUpdateRequest implements Serializable {
+    private List<IndexItem> indexIds;
     LocalDate targetDate;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class IndexItem {
+        private Long id;
+    }
 }

@@ -2,9 +2,11 @@ package com.librarian.todo_list.todos.controller;
 
 import com.librarian.todo_list.common.dto.ApiResponse;
 import com.librarian.todo_list.security.CustomUserDetails;
+import com.librarian.todo_list.todos.dto.TodosOrderUpdateRequest;
 import com.librarian.todo_list.todos.dto.TodosRegistrationRequest;
 import com.librarian.todo_list.todos.dto.TodosResponse;
 import com.librarian.todo_list.todos.dto.TodosUpdateRequest;
+import com.librarian.todo_list.todos.entity.Todos;
 import com.librarian.todo_list.todos.service.TodosService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -23,11 +26,13 @@ import java.util.List;
 public class TodosController {
     private final TodosService todosService;
 
-    @GetMapping("/")
-    public ResponseEntity<ApiResponse<List<TodosResponse>>> getTodosList() {
+    @GetMapping("/{targetDate}")
+    public ResponseEntity<ApiResponse<List<TodosResponse>>> getTodosList(
+            @PathVariable LocalDate targetDate,
+        @AuthenticationPrincipal CustomUserDetails principal) {
         log.info("할 일 목록 API 호출");
 
-        List<TodosResponse> todosResponse = todosService.getTodos();
+        List<TodosResponse> todosResponse = todosService.getTodos(principal.getUser(), targetDate);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(todosResponse, "할 일 목록을 성공적으로 불러왔습니다."));
@@ -56,6 +61,31 @@ public class TodosController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(todosResponse, "할 일이 성공적으로 수정 완료되었습니다."));
+    }
+
+    @PatchMapping("/{id}/status/{status}")
+    public ResponseEntity<ApiResponse> updateStatusTodos(
+            @PathVariable Long id,
+            @PathVariable Todos.TodosStatus status,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        log.info("할 일 상태 수정 API 호출");
+
+        todosService.updateStatusTodos(status, id, principal.getUser());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(null, "할 일 상태가 성공적으로 수정 완료되었습니다."));
+    }
+
+    @PatchMapping("/order")
+    public ResponseEntity<ApiResponse> updateOrderTodos(
+            @Valid @RequestBody TodosOrderUpdateRequest request,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        log.info("할 일 상태 수정 API 호출");
+
+        todosService.updateIndexTodos(request, principal.getUser());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(null, "할 일 상태가 성공적으로 수정 완료되었습니다."));
     }
 
     @DeleteMapping("/{id}")

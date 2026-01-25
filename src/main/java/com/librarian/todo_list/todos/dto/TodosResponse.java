@@ -26,9 +26,7 @@ public class TodosResponse {
     private Todos.TodosStatus status;
     private Integer orderIndex;
     private LocalDate targetDate;
-    /**
-     * Rewards 엔티티를 Response DTO로 변환하는 정적 메서드
-     */
+
     public static TodosResponse from(Todos todos) {
         return TodosResponse.builder()
                 .id(todos.getId())

@@ -41,6 +41,9 @@ public class UserPoint extends BaseEntity {
     @Column(nullable = false)
     private String periodKey;
 
+    @Column(nullable = false)
+    private Integer point;
+
     public enum ActionStatus {
         CREDIT, DEBIT
     }

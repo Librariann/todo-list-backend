@@ -48,6 +48,13 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(TodoStatusChangeException.class)
+    public ResponseEntity<ApiResponse<Object>> handleTodoStatusChangeException(TodoStatusChangeException ex) {
+        log.warn("TODO status change denied: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
     /**
      * 유효성 검증 실패 예외 처리
      */

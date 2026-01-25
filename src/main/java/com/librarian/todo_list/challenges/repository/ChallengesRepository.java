@@ -20,4 +20,6 @@ public interface ChallengesRepository extends JpaRepository<Challenges, Long> {
 
     //GetOne Active true
     Optional<Challenges> findByIdAndIsActiveTrue(Long id);
+
+    List<Challenges> findByWorkTypeAndIsActiveTrue(Challenges.WorkType workType);
 }
