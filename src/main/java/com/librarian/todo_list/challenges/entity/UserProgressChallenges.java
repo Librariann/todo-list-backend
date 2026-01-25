@@ -11,7 +11,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "user_progress_challenges")
+@Table(name = "user_progress_challenges", schema = "todo_list")
 @Getter
 @Setter
 @NoArgsConstructor

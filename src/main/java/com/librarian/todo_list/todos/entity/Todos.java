@@ -10,8 +10,8 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
-@Entity(name = "todo_list")
-@Table(name = "todos")
+@Entity
+@Table(name = "todos", schema = "todo_list")
 @Getter
 @Setter
 @NoArgsConstructor

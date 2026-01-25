@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 import java.util.Optional;
 
 @Entity
-@Table(name = "user_points")
+@Table(name = "user_points", schema = "todo_list")
 @Getter
 @Setter
 @NoArgsConstructor
