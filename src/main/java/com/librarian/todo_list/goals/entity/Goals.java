@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 import java.util.Date;
 
 @Entity
-@Table(name = "goals")
+@Table(name = "goals", schema = "todo_list")
 @Getter
 @Setter
 @NoArgsConstructor

@@ -8,7 +8,7 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "goal_process")
+@Table(name = "goal_process", schema = "todo_list")
 @Getter
 @Setter
 @NoArgsConstructor

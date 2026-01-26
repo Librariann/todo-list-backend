@@ -7,7 +7,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "goal_streaks")
+@Table(name = "goal_streaks", schema = "todo_list")
 @Getter
 @Setter
 @NoArgsConstructor
