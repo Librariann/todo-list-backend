@@ -3,16 +3,18 @@ package com.librarian.todo_list.auth.controller;
 import com.librarian.todo_list.auth.dto.LoginRequest;
 import com.librarian.todo_list.auth.dto.LoginResponse;
 import com.librarian.todo_list.auth.service.AuthService;
+import com.librarian.todo_list.auth.service.SessionService;
 import com.librarian.todo_list.common.dto.ApiResponse;
+import com.librarian.todo_list.security.jwt.JwtTokenProvider;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * 인증 관련 REST API 컨트롤러
- */
+@Tag(name = "인증", description = "로그인, 로그아웃, 토큰 갱신 API")
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
@@ -20,10 +22,9 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     
     private final AuthService authService;
+    private final SessionService sessionService;
+    private final JwtTokenProvider jwtTokenProvider;
     
-    /**
-     * 로그인
-     */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
         log.info("로그인 API 호출: username={}", request.getEmail());
@@ -33,11 +34,9 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(loginResponse, "로그인에 성공했습니다."));
     }
     
-    /**
-     * 토큰 갱신
-     */
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(
+        @RequestHeader("Authorization") String authHeader) {
         log.info("토큰 갱신 API 호출");
         
         // Bearer 제거
@@ -48,15 +47,26 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(loginResponse, "토큰이 갱신되었습니다."));
     }
     
-    /**
-     * 로그아웃 (클라이언트 측에서 토큰 삭제)
-     */
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<String>> logout() {
+    public ResponseEntity<ApiResponse<String>> logout(@RequestHeader("Authorization") String authHeader) {
         log.info("로그아웃 API 호출");
         
-        // JWT는 stateless하므로 서버에서 별도 처리 불필요
-        // 클라이언트에서 토큰을 삭제하면 됨
+        try {
+            if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                
+                if (jwtTokenProvider.validateToken(token)) {
+                    String sessionId = jwtTokenProvider.getSessionIdFromToken(token);
+                    
+                    if (sessionId != null) {
+                        sessionService.invalidateSession(sessionId);
+                        log.info("세션 무효화 완료: sessionId={}", sessionId);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("로그아웃 중 오류 발생: {}", e.getMessage());
+        }
         
         return ResponseEntity.ok(ApiResponse.success("로그아웃되었습니다.", "로그아웃에 성공했습니다."));
     }
