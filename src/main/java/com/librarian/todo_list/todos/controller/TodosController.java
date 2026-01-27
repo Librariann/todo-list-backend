@@ -8,6 +8,7 @@ import com.librarian.todo_list.todos.dto.TodosResponse;
 import com.librarian.todo_list.todos.dto.TodosUpdateRequest;
 import com.librarian.todo_list.todos.entity.Todos;
 import com.librarian.todo_list.todos.service.TodosService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+@Tag(name = "할 일 관리", description = "할 일 조회, 등록, 수정, 삭제 API")
 @Slf4j
 @RestController
 @RequestMapping("/api/todos")
@@ -29,7 +31,7 @@ public class TodosController {
     @GetMapping("/{targetDate}")
     public ResponseEntity<ApiResponse<List<TodosResponse>>> getTodosList(
             @PathVariable LocalDate targetDate,
-        @AuthenticationPrincipal CustomUserDetails principal) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
         log.info("할 일 목록 API 호출");
 
         List<TodosResponse> todosResponse = todosService.getTodos(principal.getUser(), targetDate);
@@ -41,7 +43,7 @@ public class TodosController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<TodosResponse>> registerTodos(
             @Valid @RequestBody TodosRegistrationRequest request,
-        @AuthenticationPrincipal CustomUserDetails principal) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
         log.info("할 일 등록 API 호출: name={}", request.getName());
 
         TodosResponse todosResponse = todosService.registerTodos(request, principal.getUser());
@@ -54,7 +56,7 @@ public class TodosController {
     public ResponseEntity<ApiResponse> updateTodos(
             @Valid @RequestBody TodosUpdateRequest request,
             @PathVariable Long id,
-        @AuthenticationPrincipal CustomUserDetails principal) {
+            @AuthenticationPrincipal CustomUserDetails principal) {
         log.info("할 일 수정 API 호출: name={}", request.getName());
 
         TodosResponse todosResponse = todosService.updateTodos(request, id, principal.getUser());
