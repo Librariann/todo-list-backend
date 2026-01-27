@@ -35,49 +35,82 @@ public class JwtTokenProvider {
      */
     public String generateAccessToken(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return generateToken(userDetails.getUsername(), jwtProperties.getExpiration());
+        return generateToken(userDetails.getUsername(), null, jwtProperties.getExpiration());
     }
     
     /**
      * Access Token 생성 (email 기반)
      */
     public String generateAccessToken(String email) {
-        return generateToken(email, jwtProperties.getExpiration());
+        return generateToken(email, null, jwtProperties.getExpiration());
+    }
+    
+    /**
+     * Access Token 생성 (email + session ID 기반)
+     */
+    public String generateAccessToken(String email, String sessionId) {
+        return generateToken(email, sessionId, jwtProperties.getExpiration());
     }
     
     /**
      * Refresh Token 생성
      */
     public String generateRefreshToken(String email) {
-        return generateToken(email, jwtProperties.getRefreshExpiration());
+        return generateToken(email, null, jwtProperties.getRefreshExpiration());
+    }
+    
+    /**
+     * Refresh Token 생성 (session ID 포함)
+     */
+    public String generateRefreshToken(String email, String sessionId) {
+        return generateToken(email, sessionId, jwtProperties.getRefreshExpiration());
     }
     
     /**
      * JWT 토큰 생성
      */
-    private String generateToken(String email, Long expiration) {
+    private String generateToken(String email, String sessionId, Long expiration) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
         
-        return Jwts.builder()
+        JwtBuilder builder = Jwts.builder()
                 .subject(email)
                 .issuedAt(now)
-                .expiration(expiryDate)
-                .signWith(getSigningKey())
-                .compact();
+                .expiration(expiryDate);
+        
+        // 세션 ID가 있으면 클레임에 추가
+        if (sessionId != null) {
+            builder.claim("sessionId", sessionId);
+        }
+        
+        return builder.signWith(getSigningKey()).compact();
     }
 
     /**
      * JWT 토큰에서 사용자 Email 추출
      */
     public String getEmailFromToken(String token) {
-        Claims claims = Jwts.parser()
+        Claims claims = getClaims(token);
+        return claims.getSubject();
+    }
+    
+    /**
+     * JWT 토큰에서 세션 ID 추출
+     */
+    public String getSessionIdFromToken(String token) {
+        Claims claims = getClaims(token);
+        return claims.get("sessionId", String.class);
+    }
+    
+    /**
+     * JWT 토큰에서 클레임 추출
+     */
+    private Claims getClaims(String token) {
+        return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-
-        return claims.getSubject();
     }
     
     /**
