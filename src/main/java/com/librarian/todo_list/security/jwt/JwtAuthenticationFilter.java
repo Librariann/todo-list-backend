@@ -1,5 +1,6 @@
 package com.librarian.todo_list.security.jwt;
 
+import com.librarian.todo_list.auth.service.SessionService;
 import com.librarian.todo_list.security.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserDetailsService customUserDetailsService;
+    private final SessionService sessionService;
     
     @Override
     protected void doFilterInternal(HttpServletRequest request, 
@@ -39,8 +41,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             
             // 토큰 유효성 검증
             if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
-                // 토큰에서 사용자명 추출
+                // 토큰에서 사용자명과 세션 ID 추출
                 String username = jwtTokenProvider.getEmailFromToken(jwt);
+                String sessionId = jwtTokenProvider.getSessionIdFromToken(jwt);
+                
+                // 세션 유효성 검증 (세션 ID가 있는 경우)
+                if (sessionId != null && !sessionService.isValidSession(sessionId)) {
+                    log.debug("유효하지 않은 세션: sessionId={}", sessionId);
+                    filterChain.doFilter(request, response);
+                    return;
+                }
                 
                 // 사용자 정보 조회
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
