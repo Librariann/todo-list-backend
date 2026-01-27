@@ -5,18 +5,19 @@ import com.librarian.todo_list.security.CustomUserDetails;
 import com.librarian.todo_list.user.dto.UserRegistrationRequest;
 import com.librarian.todo_list.user.dto.UserResponse;
 import com.librarian.todo_list.user.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
+@Tag(name = "사용자 관리", description = "회원가입, 사용자 조회, 중복 확인 API")
 @Slf4j
 @RestController
 @RequestMapping("/api/users")
@@ -25,9 +26,6 @@ public class UserController {
     
     private final UserService userService;
     
-    /**
-     * 회원가입
-     */
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponse>> registerUser(
             @Valid @RequestBody UserRegistrationRequest request) {
@@ -39,13 +37,6 @@ public class UserController {
                 .body(ApiResponse.success(userResponse, "회원가입이 성공적으로 완료되었습니다."));
     }
 
-    /**
-     * 사용자 정보 수정
-     */
-
-    /**
-     * 사용자명 중복 확인
-     */
     @GetMapping("/check-username/{username}")
     public ResponseEntity<ApiResponse<Boolean>> checknicknameAvailability(
             @PathVariable String username) {
@@ -59,9 +50,6 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(isAvailable, message));
     }
     
-    /**
-     * 이메일 중복 확인
-     */
     @GetMapping("/check-email/{email:.+}")
     public ResponseEntity<ApiResponse<Boolean>> checkEmailAvailability(
             @PathVariable String email) {
@@ -75,9 +63,6 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(isAvailable, message));
     }
     
-    /**
-     * 사용자 ID로 조회
-     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable Long id) {
         log.info("사용자 조회: id={}", id);
@@ -91,9 +76,6 @@ public class UserController {
         }
     }
     
-    /**
-     * 사용자명으로 조회
-     */
     @GetMapping("/username/{username}")
     public ResponseEntity<ApiResponse<UserResponse>> getUserByNickname(@PathVariable String username) {
         log.info("사용자명으로 조회: username={}", username);
@@ -107,9 +89,6 @@ public class UserController {
         }
     }
     
-    /**
-     * 모든 활성 사용자 조회
-     */
     @GetMapping("/active")
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllActiveUsers() {
         log.info("모든 활성 사용자 조회");
@@ -118,17 +97,11 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(users, "활성 사용자 목록 조회가 완료되었습니다."));
     }
     
-    /**
-     * 헬스 체크 엔드포인트
-     */
     @GetMapping("/health")
     public ResponseEntity<ApiResponse<String>> healthCheck() {
         return ResponseEntity.ok(ApiResponse.success("OK", "사용자 서비스가 정상적으로 동작 중입니다."));
     }
 
-    /**
-     * 본인 information
-     */
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserResponse>> me(@AuthenticationPrincipal CustomUserDetails principal) {
         return ResponseEntity.ok(ApiResponse.success(UserResponse.from(principal.getUser()), "내 정보 조회"));
