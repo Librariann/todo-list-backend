@@ -29,6 +29,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final SessionService sessionService;
     
     /**
      * 로그인 - JWT 토큰 발급
@@ -50,11 +51,14 @@ public class AuthService {
             throw new BadCredentialsException("비활성화된 계정입니다");
         }
         
-        // JWT 토큰 생성
-        String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail());
-        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
+        // Redis 세션 생성
+        String sessionId = sessionService.createSession(user);
         
-        log.info("로그인 성공: username={}", user.getEmail());
+        // JWT 토큰 생성 (세션 ID 포함)
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail(), sessionId);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail(), sessionId);
+        
+        log.info("로그인 성공: username={}, sessionId={}", user.getEmail(), sessionId);
         
         return LoginResponse.builder()
                 .accessToken(accessToken)
@@ -75,17 +79,28 @@ public class AuthService {
             throw new BadCredentialsException("유효하지 않은 리프레시 토큰입니다");
         }
         
-        // 토큰에서 사용자 이메일 추출
+        // 토큰에서 사용자 이메일과 세션 ID 추출
         String email = jwtTokenProvider.getEmailFromToken(refreshToken);
+        String sessionId = jwtTokenProvider.getSessionIdFromToken(refreshToken);
+        
+        // 세션 유효성 검증
+        if (sessionId != null && !sessionService.isValidSession(sessionId)) {
+            throw new BadCredentialsException("유효하지 않은 세션입니다");
+        }
         
         // 사용자 조회
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
         
-        // 새로운 액세스 토큰 생성
-        String newAccessToken = jwtTokenProvider.generateAccessToken(user.getEmail());
+        // 세션 갱신 (있는 경우)
+        if (sessionId != null) {
+            sessionService.refreshSession(sessionId);
+        }
         
-        log.info("토큰 갱신 성공: username={}", user.getNickname());
+        // 새로운 액세스 토큰 생성 (세션 ID 포함)
+        String newAccessToken = jwtTokenProvider.generateAccessToken(user.getEmail(), sessionId);
+        
+        log.info("토큰 갱신 성공: username={}, sessionId={}", user.getNickname(), sessionId);
         
         return LoginResponse.builder()
                 .accessToken(newAccessToken)
