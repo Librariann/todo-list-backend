@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -28,14 +29,15 @@ public class Goals extends BaseEntity {
     private String description;
 
     @Column(nullable = false)
-    private UserPoint.PeriodTypeStatus recurrence_type;
+    @Enumerated(EnumType.STRING)
+    private UserPoint.PeriodTypeStatus recurrenceType;
 
     @Column(nullable = false)
     @Builder.Default
     private Integer interval = 1;
 
     @Column(nullable = false)
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(nullable = false)
     @Builder.Default
