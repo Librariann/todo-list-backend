@@ -17,10 +17,12 @@ import java.util.Optional;
 @SuperBuilder
 public class UserPoint extends BaseEntity {
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
     private ActionStatus action = ActionStatus.CREDIT;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
     private ReasonStatus reason = ReasonStatus.CHALLENGE;
@@ -29,12 +31,14 @@ public class UserPoint extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = true)
     private MetaTypeStatus metaType;
 
     @Column(nullable = true)
     private Long metaId;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PeriodTypeStatus periodType;
 
