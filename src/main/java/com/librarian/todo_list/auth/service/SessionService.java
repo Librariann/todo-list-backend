@@ -62,7 +62,7 @@ public class SessionService {
         if (sessionId == null) {
             return;
         }
-        
+         
         Map<String, Object> sessionData = getSession(sessionId);
         if (sessionData != null) {
             String sessionKey = SESSION_PREFIX + sessionId;
