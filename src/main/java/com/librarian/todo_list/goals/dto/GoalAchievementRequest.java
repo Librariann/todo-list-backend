@@ -7,7 +7,6 @@ import java.io.Serializable;
 
 @Value
 public class GoalAchievementRequest implements Serializable {
-    
     @NotNull
     Long goalId;
 }
