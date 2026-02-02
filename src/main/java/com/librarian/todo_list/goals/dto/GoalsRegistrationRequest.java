@@ -15,8 +15,8 @@ public class GoalsRegistrationRequest implements Serializable {
 
     @NotBlank
     @Length(min = 4, max = 50)
-    String name;
-    String description;
+    String name; //이름
+    String description; //설명
     @NotNull
     UserPoint.PeriodTypeStatus recurrenceType;
     @NotNull
