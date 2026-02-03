@@ -21,10 +21,10 @@ public interface GoalsRepository extends JpaRepository<Goals, Long> {
     Optional<Goals> findByIdAndUser(Long id, User user);
     
     @Query("SELECT g FROM Goals g WHERE g.isActive = true AND " +
-           "((g.recurrenceType = 'DAILY' AND DATEDIFF(:currentDate, g.startDate) % g.interval = 0) OR " +
-           "(g.recurrenceType = 'WEEKLY' AND DATEDIFF(:currentDate, g.startDate) % (g.interval * 7) = 0) OR " +
-           "(g.recurrenceType = 'MONTHLY' AND FUNCTION('DAY', :currentDate) = FUNCTION('DAY', g.startDate) AND " +
-           "DATEDIFF(MONTH, g.startDate, :currentDate) % g.interval = 0))")
+           "((g.recurrenceType = 'DAILY' AND mod(datediff(day, g.startDate, :currentDate), g.interval) = 0) OR " +
+           "(g.recurrenceType = 'WEEKLY' AND mod(datediff(day, g.startDate, :currentDate), (g.interval * 7)) = 0) OR " +
+           "(g.recurrenceType = 'MONTHLY' AND day(:currentDate) = day(g.startDate) AND " +
+           "mod(datediff(month, g.startDate, :currentDate), g.interval) = 0))")
     List<Goals> findGoalsToReset(@Param("currentDate") LocalDate currentDate);
     
     @Query("SELECT COUNT(g) > 0 FROM Goals g WHERE g.user = :user AND g.name = :name AND g.isActive = true")
