@@ -44,6 +44,7 @@ public class TodosService {
         // 중복 할 일 확인
         validateTodosUniqueness(request.getName());
         int orderIndex = max.map(Todos::getOrderIndex).orElse(0) + 1;
+
         // create Todos Entity
         Todos todos = Todos.builder()
                 .name(request.getName())
