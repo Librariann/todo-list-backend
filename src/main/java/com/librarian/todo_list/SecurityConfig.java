@@ -1,15 +1,19 @@
 package com.librarian.todo_list;
 
+import com.librarian.todo_list.auth.handler.OAuth2AuthenticationFailureHandler;
+import com.librarian.todo_list.auth.handler.OAuth2AuthenticationSuccessHandler;
+import com.librarian.todo_list.auth.oauth2.CustomOAuth2UserService;
+import com.librarian.todo_list.auth.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.librarian.todo_list.security.jwt.JwtAuthenticationEntryPoint;
 import com.librarian.todo_list.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -25,6 +29,10 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2FailureHandler;
+    private final HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -47,10 +55,12 @@ public class SecurityConfig {
                         // 인증 없이 접근 가능한 엔드포인트
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/api/users/register", 
-                                "/api/users/check-username/**", 
+                                "/api/users/register",
+                                "/api/users/check-username/**",
                                 "/api/users/check-email/**",
                                 "/api/users/health",
+                                "/oauth2/**",
+                                "/login/oauth2/**",
                                 "/swagger-ui/**",
                                 "/api-docs/**",
                                 "/swagger-ui.html"
@@ -60,8 +70,16 @@ public class SecurityConfig {
                 )
                 
                 // JWT 필터 추가
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
+                // OAuth2 로그인
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(endpoint -> endpoint
+                                .authorizationRequestRepository(cookieAuthorizationRequestRepository))
+                        .userInfoEndpoint(endpoint -> endpoint
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oAuth2FailureHandler));
         return http.build();
     }
     
@@ -89,9 +107,5 @@ public class SecurityConfig {
         
         return source;
     }
-    
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+
 }
