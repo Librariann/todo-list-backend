@@ -37,12 +37,6 @@ public class ChallengesController {
         summary = "모든 도전과제 목록 조회", 
         description = "시스템에 등록된 모든 도전과제를 조회합니다. 일일/주간/월간 도전과제가 포함됩니다."
     )
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "200", 
-            description = "도전과제 목록 조회 성공"
-        )
-    })
     @GetMapping("/")
     public ResponseEntity<ApiResponse<List<ChallengesResponse>>> getChallenges() {
         log.info("상품 목록 API 호출");
@@ -57,16 +51,6 @@ public class ChallengesController {
         summary = "새로운 도전과제 등록", 
         description = "새로운 도전과제를 시스템에 등록합니다. TODOS, HABITS, GOALS 타입을 지원하며 일일/주간/월간 주기를 설정할 수 있습니다."
     )
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "201", 
-            description = "도전과제 등록 성공"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "400", 
-            description = "잘못된 요청 데이터"
-        )
-    })
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<ChallengesResponse>> registerChallenge(
             @Valid @RequestBody ChallengesRegistrationRequest request) {
@@ -82,20 +66,6 @@ public class ChallengesController {
         summary = "도전과제 정보 수정", 
         description = "기존 도전과제의 정보를 수정합니다."
     )
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "200", 
-            description = "도전과제 수정 성공"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "404", 
-            description = "도전과제를 찾을 수 없음"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "400", 
-            description = "잘못된 요청 데이터"
-        )
-    })
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse> updateChallenge(
             @Valid @RequestBody ChallengesUpdateRequest request,
@@ -113,16 +83,6 @@ public class ChallengesController {
         summary = "도전과제 삭제", 
         description = "도전과제를 시스템에서 완전히 삭제합니다. 삭제된 데이터는 복구할 수 없습니다."
     )
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "200", 
-            description = "도전과제 삭제 성공"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "404", 
-            description = "도전과제를 찾을 수 없음"
-        )
-    })
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<ChallengesResponse>> deleteChallenge(
             @Parameter(description = "삭제할 도전과제의 ID", example = "1")
