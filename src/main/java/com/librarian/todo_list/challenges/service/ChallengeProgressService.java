@@ -31,16 +31,50 @@ public class ChallengeProgressService {
         log.info("TODO 챌린지 진행도 업데이트 시작 - 사용자: {}, 날짜: {}", user.getId(), date);
 
         List<Challenges> activeTodosChallenges = challengesRepository
-            .findByWorkTypeAndIsActiveTrue(Challenges.WorkType.TODOS);
+                .findByWorkTypeAndIsActiveTrue(Challenges.WorkType.TODOS);
 
         log.info("활성화된 TODOS 챌린지 개수: {}", activeTodosChallenges.size());
 
         for (Challenges challenge : activeTodosChallenges) {
-            log.info("챌린지 처리 시작 - 챌린지ID: {}, 이름: {}", challenge.getId(), challenge.getName());
+            log.info("[Todos] 챌린지 처리 시작 - 챌린지ID: {}, 이름: {}", challenge.getId(), challenge.getName());
             updateChallengeProgress(user, challenge, date);
         }
 
         log.info("TODO 챌린지 진행도 업데이트 완료 - 사용자: {}", user.getId());
+    }
+
+    @Transactional
+    public void updateGoalsChallengeProgress(User user, LocalDate date) {
+        log.info("GOALS 챌린지 진행도 업데이트 시작 - 사용자: {}, 날짜: {}", user.getId(), date);
+
+        List<Challenges> activeGoalsChallenges = challengesRepository
+                .findByWorkTypeAndIsActiveTrue(Challenges.WorkType.GOALS);
+
+        log.info("활성화된 GOALS 챌린지 개수: {}", activeGoalsChallenges.size());
+
+        for (Challenges challenge : activeGoalsChallenges) {
+            log.info("[Goals] 챌린지 처리 시작 - 챌린지ID: {}, 이름: {}", challenge.getId(), challenge.getName());
+            updateChallengeProgress(user, challenge, date);
+        }
+
+        log.info("GOALS 챌린지 진행도 업데이트 완료 - 사용자: {}", user.getId());
+    }
+
+    @Transactional
+    public void updateHabitsChallengeProgress(User user, LocalDate date) {
+        log.info("HABITS 챌린지 진행도 업데이트 시작 - 사용자: {}, 날짜: {}", user.getId(), date);
+
+        List<Challenges> activeTodosChallenges = challengesRepository
+                .findByWorkTypeAndIsActiveTrue(Challenges.WorkType.HABITS);
+
+        log.info("활성화된 HABITS 챌린지 개수: {}", activeTodosChallenges.size());
+
+        for (Challenges challenge : activeTodosChallenges) {
+            log.info("[Habits] 챌린지 처리 시작 - 챌린지ID: {}, 이름: {}", challenge.getId(), challenge.getName());
+            updateChallengeProgress(user, challenge, date);
+        }
+
+        log.info("HABITS 챌린지 진행도 업데이트 완료 - 사용자: {}", user.getId());
     }
 
     private void updateChallengeProgress(User user, Challenges challenge, LocalDate date) {
