@@ -58,6 +58,8 @@ public class ChallengesService {
                 .description(request.getDescription())
                 .icon(request.getIcon())
                 .targetCount(request.getTargetCount())
+                .dailyMaxCount(request.getDailyMaxCount())
+                .workType(request.getWorkType())
                 .point(request.getPoint())
                 .isActive(request.isActive())
                 .build();
