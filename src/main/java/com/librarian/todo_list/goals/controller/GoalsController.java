@@ -136,7 +136,7 @@ public class GoalsController {
         log.info("목표 달성 API 호출: goalId={}, userId={}", goalId, principal.getUser().getId());
         
         Goals goal = goalsService.findByIdAndUser(goalId, principal.getUser());
-        boolean wasAchieved = goalProcessService.achieveGoal(goal, principal.getUser());
+        boolean wasAchieved = goalProcessService.achieveGoal(goalId, principal.getUser());
         GoalProcess process = goalProcessService.getCurrentProcess(goal, principal.getUser());
         
         String message = wasAchieved ? "목표 달성 완료! 포인트가 지급되었습니다." : "목표 진행도가 업데이트되었습니다.";
