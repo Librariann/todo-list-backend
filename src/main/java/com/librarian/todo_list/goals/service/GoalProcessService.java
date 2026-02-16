@@ -2,12 +2,17 @@ package com.librarian.todo_list.goals.service;
 
 import com.librarian.todo_list.goals.entity.GoalProcess;
 import com.librarian.todo_list.goals.entity.Goals;
+import com.librarian.todo_list.goals.event.GoalCompletedEvent;
 import com.librarian.todo_list.goals.repository.GoalProcessRepository;
+import com.librarian.todo_list.goals.repository.GoalsRepository;
 import com.librarian.todo_list.points.entity.UserPoint;
 import com.librarian.todo_list.points.service.UserPointService;
+import com.librarian.todo_list.todos.entity.Todos;
+import com.librarian.todo_list.todos.event.TodoCompletedEvent;
 import com.librarian.todo_list.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +29,9 @@ public class GoalProcessService {
     private final GoalProcessRepository goalProcessRepository;
     private final GoalStreaksService goalStreaksService;
     private final UserPointService userPointService;
-    
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final GoalsRepository goalsRepository;
+
     @Transactional
     public void initializeGoalProcess(Goals goal, User user) {
         LocalDate startDate = goal.getStartDate();
@@ -47,7 +54,11 @@ public class GoalProcessService {
     }
     
     @Transactional
-    public boolean achieveGoal(Goals goal, User user) {
+    public boolean achieveGoal(Long goalId, User user) {
+
+        Goals goal = goalsRepository.findByIdAndUser(goalId, user)
+                .orElseThrow(() -> new IllegalArgumentException("목표를 찾을 수 없습니다: " + goalId));
+
         GoalProcess process = goalProcessRepository.findByGoalsAndUserAndIsFinalizedFalse(goal, user)
                 .orElseThrow(() -> new IllegalArgumentException("활성 목표 프로세스를 찾을 수 없습니다"));
         
@@ -60,8 +71,11 @@ public class GoalProcessService {
         boolean wasAchieved = process.getCurrentCount() >= goal.getTargetCount();
         if (wasAchieved && !process.getIsAchieved()) {
             process.setIsAchieved(true);
-            
-            grantAchievementReward(goal, user);
+            log.info("GOALS 완료 이벤트 발행 - 사용자: {}, GOALS: {}", user.getId(), goalId);
+            applicationEventPublisher.publishEvent(
+                    new GoalCompletedEvent(user, process, LocalDate.now())
+            );
+//            grantAchievementReward(goal, user);
             
             log.info("목표 달성 완료: goalId={}, userId={}, count={}/{}", 
                     goal.getId(), user.getId(), process.getCurrentCount(), goal.getTargetCount());
@@ -137,25 +151,25 @@ public class GoalProcessService {
         };
     }
     
-    private void grantAchievementReward(Goals goal, User user) {
-        int basePoints = switch (goal.getRecurrenceType()) {
-            case DAILY -> 10;
-            case WEEKLY -> 50;
-            case MONTHLY -> 200;
-        };
-        
-        int rewardPoints = basePoints * goal.getInterval();
-        
-        String periodKey = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        
-        userPointService.awardChallengePoints(
-            user, 
-            rewardPoints,
-            goal.getId(),
-            goal.getRecurrenceType()
-        );
-        
-        log.info("목표 달성 포인트 지급: goalId={}, userId={}, points={}", 
-                goal.getId(), user.getId(), rewardPoints);
-    }
+//    private void grantAchievementReward(Goals goal, User user) {
+//        int basePoints = switch (goal.getRecurrenceType()) {
+//            case DAILY -> 10;
+//            case WEEKLY -> 50;
+//            case MONTHLY -> 200;
+//        };
+//
+//        int rewardPoints = basePoints * goal.getInterval();
+//
+//        String periodKey = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+//
+//        userPointService.awardChallengePoints(
+//            user,
+//            rewardPoints,
+//            goal.getId(),
+//            goal.getRecurrenceType()
+//        );
+//
+//        log.info("목표 달성 포인트 지급: goalId={}, userId={}, points={}",
+//                goal.getId(), user.getId(), rewardPoints);
+//    }
 }
