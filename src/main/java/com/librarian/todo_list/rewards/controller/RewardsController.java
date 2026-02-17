@@ -37,12 +37,6 @@ public class RewardsController {
         summary = "모든 보상 목록 조회", 
         description = "시스템에 등록된 모든 보상 항목을 조회합니다."
     )
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "200", 
-            description = "보상 목록 조회 성공"
-        )
-    })
     @GetMapping("/")
     public ResponseEntity<ApiResponse<List<RewardsResponse>>> getRewardList() {
         log.info("상품 목록 API 호출");
@@ -57,16 +51,6 @@ public class RewardsController {
         summary = "특정 보상 조회", 
         description = "보상 ID를 통해 특정 보상의 상세 정보를 조회합니다."
     )
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "200", 
-            description = "보상 조회 성공"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "404", 
-            description = "보상을 찾을 수 없음"
-        )
-    })
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<RewardsResponse>> getOneReward(
             @Parameter(description = "조회할 보상의 ID", example = "1")
@@ -83,16 +67,6 @@ public class RewardsController {
         summary = "새로운 보상 등록", 
         description = "새로운 보상 항목을 시스템에 등록합니다. 관리자 권한이 필요할 수 있습니다."
     )
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "201", 
-            description = "보상 등록 성공"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "400", 
-            description = "잘못된 요청 데이터"
-        )
-    })
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RewardsResponse>> registerReward(
             @Valid @RequestBody RewardsRegistrationRequest request) {
@@ -108,20 +82,6 @@ public class RewardsController {
         summary = "보상 정보 수정", 
         description = "기존 보상의 정보를 수정합니다."
     )
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "200", 
-            description = "보상 수정 성공"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "404", 
-            description = "보상을 찾을 수 없음"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "400", 
-            description = "잘못된 요청 데이터"
-        )
-    })
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse> updateReward(
             @Valid @RequestBody RewardsUpdateRequest request,
@@ -139,16 +99,6 @@ public class RewardsController {
         summary = "보상 삭제", 
         description = "보상을 시스템에서 완전히 삭제합니다. 삭제된 데이터는 복구할 수 없습니다."
     )
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "200", 
-            description = "보상 삭제 성공"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "404", 
-            description = "보상을 찾을 수 없음"
-        )
-    })
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<RewardsResponse>> deleteReward(
             @Parameter(description = "삭제할 보상의 ID", example = "1")
