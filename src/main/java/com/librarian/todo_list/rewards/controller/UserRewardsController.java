@@ -39,12 +39,6 @@ public class UserRewardsController {
         summary = "내가 받은 보상 목록 조회", 
         description = "현재 사용자가 받은 모든 보상 목록을 조회합니다."
     )
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "200", 
-            description = "보상 목록 조회 성공"
-        )
-    })
     @GetMapping("/")
     public ResponseEntity<ApiResponse<List<UserRewardsResponse>>> getUserRewardList() {
         log.info("유저 상품 목록 API 호출");
@@ -59,20 +53,6 @@ public class UserRewardsController {
         summary = "보상 받기", 
         description = "포인트를 사용하여 보상을 받습니다. 충분한 포인트가 있어야 합니다."
     )
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "201", 
-            description = "보상 지급 성공"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "400", 
-            description = "포인트가 부족하거나 잘못된 요청"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "404", 
-            description = "보상을 찾을 수 없음"
-        )
-    })
     @PostMapping("/{rewardId}/redeem")
     public ResponseEntity<ApiResponse<UserRewardsResponse>> redeemUserReward(
             @Parameter(description = "받을 보상의 ID", example = "1")
@@ -90,20 +70,6 @@ public class UserRewardsController {
         summary = "받은 보상 사용하기", 
         description = "받은 보상을 사용 처리합니다. 사용된 보상은 다시 사용할 수 없습니다."
     )
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "200", 
-            description = "보상 사용 성공"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "404", 
-            description = "받은 보상을 찾을 수 없음"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "400", 
-            description = "이미 사용된 보상"
-        )
-    })
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse> useUserReward(
             @Parameter(description = "사용할 받은 보상의 ID", example = "1")
