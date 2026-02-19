@@ -17,5 +17,5 @@ public interface TodosRepository extends JpaRepository<Todos, Long> {
     boolean existsByName(String name);
     Optional<Todos> findTopByUserAndTargetDateOrderByOrderIndexDesc(User user, LocalDate targetDate);
     boolean existsByNameAndIdNot(String name, Long id);
-    Optional<Todos> findByIdAndUserId(Long id, Long userId);
+    Optional<Todos> findByIdAndUser(Long id, User user);
 }
