@@ -62,7 +62,7 @@ public class TodosService {
     // 수정
     @Transactional
     public TodosResponse updateTodos(TodosUpdateRequest request, Long id, User user) {
-        Todos getTodos = todosRepository.findByIdAndUserId(id, user.getId())
+        Todos getTodos = todosRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new IllegalArgumentException("할 일을 찾을 수 없습니다: " + id));
 
         if(request.getName() != null
@@ -80,7 +80,7 @@ public class TodosService {
     //상태 변경
     @Transactional
     public void updateStatusTodos(Todos.TodosStatus status, Long id, User user) {
-        Todos getTodos = todosRepository.findByIdAndUserId(id, user.getId())
+        Todos getTodos = todosRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new IllegalArgumentException("할 일을 찾을 수 없습니다: " + id));
 
         if(getTodos.getStatus() == Todos.TodosStatus.DONE && status != Todos.TodosStatus.DONE) {
@@ -110,13 +110,11 @@ public class TodosService {
     // 삭제
     @Transactional
     public void deleteTodos(Long id, User user) {
-        Todos getTodos = todosRepository.findByIdAndUserId(id, user.getId())
+        Todos getTodos = todosRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new IllegalArgumentException("할 일을 찾을 수 없습니다: " + id));
         todosRepository.delete(getTodos);
     }
-    /**
-     * 이미 사용중인 Todos 확인
-     */
+//     이미 사용중인 Todos 확인
     private void validateTodosUniqueness(String name) {
         if (todosRepository.existsByName(name)) {
             throw new CommonAlreadyExistsException("이미 사용중인 할 일 입니다: " + name);
