@@ -36,6 +36,12 @@ public class User extends BaseEntity {
     
     @Column(length = 20)
     private String phoneNumber;
+
+    @Column(length = 20)
+    private String provider;
+
+    @Column(length = 255)
+    private String providerId;
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
