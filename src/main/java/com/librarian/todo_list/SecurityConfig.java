@@ -36,14 +36,12 @@ public class SecurityConfig {
                 
                 // 하이브리드 세션 관리 (JWT + Redis Session)
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .maximumSessions(5)
-                        .maxSessionsPreventsLogin(false))
-                
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 // 예외 처리
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint))
-                
+
                 // 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         // 인증 없이 접근 가능한 엔드포인트
