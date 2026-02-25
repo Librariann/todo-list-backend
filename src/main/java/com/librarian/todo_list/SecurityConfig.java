@@ -1,29 +1,37 @@
 package com.librarian.todo_list;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.librarian.todo_list.auth.handler.OAuth2AuthenticationFailureHandler;
 import com.librarian.todo_list.auth.handler.OAuth2AuthenticationSuccessHandler;
 import com.librarian.todo_list.auth.oauth2.CustomOAuth2UserService;
 import com.librarian.todo_list.auth.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.librarian.todo_list.common.dto.ApiResponse;
 import com.librarian.todo_list.security.jwt.JwtAuthenticationEntryPoint;
 import com.librarian.todo_list.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -48,7 +56,8 @@ public class SecurityConfig {
 
                 // 예외 처리
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler()))
 
                 // 권한 설정
                 .authorizeHttpRequests(auth -> auth
@@ -83,6 +92,19 @@ public class SecurityConfig {
         return http.build();
     }
     
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, ex) -> {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("UTF-8");
+            String body = new ObjectMapper().writeValueAsString(
+                    ApiResponse.error("접근 권한이 없습니다.")
+            );
+            response.getWriter().write(body);
+        };
+    }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
