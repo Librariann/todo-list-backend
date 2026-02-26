@@ -147,7 +147,7 @@ public class HabitsService {
 
     /**
      * 카운터 -1 (실수 취소)
-     * 취소 정책 C안: 이미 발행된 챌린지/포인트 이벤트는 롤백하지 않음
+     * 이미 발행된 챌린지/포인트 이벤트는 롤백하지 않음
      * 단, isAchieved는 재평가
      */
     @Transactional
