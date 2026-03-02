@@ -1,8 +1,10 @@
 package com.librarian.todo_list.points.service;
 
+import com.librarian.todo_list.points.dto.UserPointsInputRequest;
 import com.librarian.todo_list.points.entity.UserPoint;
 import com.librarian.todo_list.points.repository.UserPointRepository;
 import com.librarian.todo_list.user.entity.User;
+import com.librarian.todo_list.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.time.LocalDate;
 public class UserPointService {
 
     private final UserPointRepository userPointRepository;
+    private final UserRepository userRepository;
 
     /**
      * 챌린지 완료로 인한 포인트 지급
@@ -44,6 +47,36 @@ public class UserPointService {
 
         userPointRepository.save(userPoint);
         log.info("포인트 지급 완료 - 사용자: {}, 포인트: {}", user.getId(), points);
+    }
+
+    /**
+     * 사용자의 포인트 입력 (운영자권한)
+     */
+    @Transactional
+    public Integer inputUserPoints(User admin, UserPointsInputRequest request) {
+        log.info("어드민 포인트 입력 - 관리자: {}, 대상 사용자: {}, 포인트: {}",
+                admin.getId(), request.getId(), request.getPoint());
+
+        User targetUser = userRepository.findById(request.getId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+
+        LocalDate now = LocalDate.now();
+        String periodKey = generatePeriodKey(UserPoint.PeriodTypeStatus.DAILY, now);
+
+        UserPoint userPoint = UserPoint.builder()
+                .user(targetUser)
+                .action(UserPoint.ActionStatus.CREDIT)
+                .reason(UserPoint.ReasonStatus.ADJUST)
+                .metaType(UserPoint.MetaTypeStatus.ADMIN)
+                .periodType(UserPoint.PeriodTypeStatus.DAILY)
+                .periodKey(periodKey)
+                .point(request.getPoint())
+                .build();
+
+        userPointRepository.save(userPoint);
+        log.info("어드민 포인트 입력 완료 - 대상 사용자: {}, 지급 포인트: {}", targetUser.getId(), request.getPoint());
+
+        return userPointRepository.calculateUserTotalPoints(targetUser.getId()).orElse(0);
     }
 
     /**
