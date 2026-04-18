@@ -1,7 +1,6 @@
 package com.librarian.todo_list.challenges.controller;
 
 import com.librarian.todo_list.challenges.dto.*;
-import com.librarian.todo_list.challenges.service.ChallengesService;
 import com.librarian.todo_list.challenges.service.UserProgressChallengesService;
 import com.librarian.todo_list.common.dto.ApiResponse;
 import com.librarian.todo_list.security.CustomUserDetails;
@@ -33,24 +32,46 @@ import java.util.List;
 public class UserProgressChallengesController {
     private final UserProgressChallengesService userProgressChallengesService;
 
+    @Operation(summary = "도전과제 목록 + 내 진행상황 조회", description = "활성화된 전체 도전과제 목록과 현재 로그인한 사용자의 이번 기간 진행상황을 함께 반환합니다.")
+    @GetMapping("/")
+    public ResponseEntity<ApiResponse<List<ChallengesWithProgressResponse>>> getChallengesWithProgress(
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        log.info("챌린지 + 진행상황 조회 API 호출: userId={}", principal.getUser().getId());
+
+        List<ChallengesWithProgressResponse> response = userProgressChallengesService.getChallengesWithProgress(principal.getUser());
+
+        return ResponseEntity.ok(ApiResponse.success(response, "도전과제 목록을 성공적으로 불러왔습니다."));
+    }
+
+    @Operation(summary = "달성한 도전과제 목록 조회", description = "현재 로그인한 사용자가 달성한 도전과제 목록을 조회합니다.")
+    @GetMapping("/achieved")
+    public ResponseEntity<ApiResponse<List<UserProgressChallengesRes>>> getAchievedChallenges(
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        log.info("달성한 도전과제 목록 조회 API 호출: userId={}", principal.getUser().getId());
+
+        List<UserProgressChallengesRes> response = userProgressChallengesService.getAchievedChallenges(principal.getUser());
+
+        return ResponseEntity.ok(ApiResponse.success(response, "달성한 도전과제 목록을 성공적으로 불러왔습니다."));
+    }
+
     @Operation(
-        summary = "도전과제 진행상황 업데이트", 
-        description = "사용자의 도전과제 진행상황을 수동으로 업데이트합니다. 일반적으로는 할 일 완료 시 자동으로 처리되지만, 수동 업데이트가 필요한 경우 사용합니다."
+            summary = "현재 도전과제와 내가 달성한 도전과제 매칭",
+            description = "사용자의 현재 도전과제와 내가 달성하 도전과제 매칭하여 데이터를 가져옵니다."
     )
-    @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "201", 
-            description = "진행상황 업데이트 성공"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "400", 
-            description = "잘못된 요청 데이터"
-        ),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "404", 
-            description = "도전과제를 찾을 수 없음"
-        )
-    })
+    @GetMapping("/match")
+    public ResponseEntity<ApiResponse<List<ChallengesWithProgressResponse>>> getMatchUserChallenge(
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        log.info("도전과제 매칭 API 호출: name={}", principal.getUser().getId());
+
+        List<ChallengesWithProgressResponse> response = userProgressChallengesService.getMatchChallenges(principal.getUser());
+
+        return ResponseEntity.ok(ApiResponse.success(response, "달성한 도전과제 목록을 성공적으로 불러왔습니다."));
+    }
+
+    @Operation(
+            summary = "도전과제 진행상황 업데이트",
+            description = "사용자의 도전과제 진행상황을 수동으로 업데이트합니다. 일반적으로는 할 일 완료 시 자동으로 처리되지만, 수동 업데이트가 필요한 경우 사용합니다."
+    )
     @PostMapping("/progress")
     public ResponseEntity<ApiResponse<UserProgressChallengesRes>> progressUserChallenge(
             @Valid @RequestBody UserProgressChallengesReq request,
@@ -62,4 +83,6 @@ public class UserProgressChallengesController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(challengesResponse, "도전과제가 성공적으로 등록 완료되었습니다."));
     }
+
+
 }
