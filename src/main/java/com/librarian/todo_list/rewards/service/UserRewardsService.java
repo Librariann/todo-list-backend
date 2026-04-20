@@ -25,9 +25,8 @@ public class UserRewardsService {
 
     private final UserRewardsRepository userRewardsRepository;
     private final RewardsRepository rewardsRepository;
-    //get list
-    public List<UserRewardsResponse> getUserRewards() {
-        return userRewardsRepository.findByIsUsedTrue()
+    public List<UserRewardsResponse> getUserRewards(User user) {
+        return userRewardsRepository.findByUser(user)
                 .stream()
                 .map(UserRewardsResponse::from)
                 .toList();
