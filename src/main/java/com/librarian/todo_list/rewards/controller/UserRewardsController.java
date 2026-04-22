@@ -40,10 +40,11 @@ public class UserRewardsController {
         description = "현재 사용자가 받은 모든 보상 목록을 조회합니다."
     )
     @GetMapping("/")
-    public ResponseEntity<ApiResponse<List<UserRewardsResponse>>> getUserRewardList() {
-        log.info("유저 상품 목록 API 호출");
+    public ResponseEntity<ApiResponse<List<UserRewardsResponse>>> getUserRewardList(
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        log.info("유저 상품 목록 API 호출: userId={}", principal.getUser().getId());
 
-        List<UserRewardsResponse> rewardResponse = userRewardsService.getUserRewards();
+        List<UserRewardsResponse> rewardResponse = userRewardsService.getUserRewards(principal.getUser());
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(rewardResponse, "받은 보상 목록을 성공적으로 불러왔습니다."));
