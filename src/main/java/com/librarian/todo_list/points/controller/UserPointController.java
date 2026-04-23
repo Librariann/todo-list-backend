@@ -33,6 +33,7 @@ public class UserPointController {
         Integer points = userPointService.getUserTotalPoints(principal.getUser());
         return ResponseEntity.ok(ApiResponse.success(points, "포인트 조회 성공"));
     }
+
     @Operation(summary = "유저 포인트 입력 (어드민 전용)", description = "어드민이 특정 사용자의 포인트를 지급합니다.")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/")
