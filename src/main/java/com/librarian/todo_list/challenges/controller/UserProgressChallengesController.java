@@ -55,20 +55,6 @@ public class UserProgressChallengesController {
     }
 
     @Operation(
-            summary = "현재 도전과제와 내가 달성한 도전과제 매칭",
-            description = "사용자의 현재 도전과제와 내가 달성하 도전과제 매칭하여 데이터를 가져옵니다."
-    )
-    @GetMapping("/match")
-    public ResponseEntity<ApiResponse<List<ChallengesWithProgressResponse>>> getMatchUserChallenge(
-            @AuthenticationPrincipal CustomUserDetails principal) {
-        log.info("도전과제 매칭 API 호출: name={}", principal.getUser().getId());
-
-        List<ChallengesWithProgressResponse> response = userProgressChallengesService.getMatchChallenges(principal.getUser());
-
-        return ResponseEntity.ok(ApiResponse.success(response, "달성한 도전과제 목록을 성공적으로 불러왔습니다."));
-    }
-
-    @Operation(
             summary = "도전과제 진행상황 업데이트",
             description = "사용자의 도전과제 진행상황을 수동으로 업데이트합니다. 일반적으로는 할 일 완료 시 자동으로 처리되지만, 수동 업데이트가 필요한 경우 사용합니다."
     )
