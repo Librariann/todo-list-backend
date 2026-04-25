@@ -54,16 +54,6 @@ public class UserProgressChallengesService {
                 .toList();
     }
 
-    public List<ChallengesWithProgressResponse> getMatchChallenges(User user) {
-        LocalDate now = LocalDate.now();
-        return userProgressChallengesRepository.findUserMatchChallengeByUser(user,
-                        generatePeriodKey(UserPoint.PeriodTypeStatus.DAILY,now),
-                        generatePeriodKey(UserPoint.PeriodTypeStatus.WEEKLY,now),
-                        generatePeriodKey(UserPoint.PeriodTypeStatus.MONTHLY,now))
-                .stream()
-                .toList();
-    }
-
     @Transactional
     public UserProgressChallengesRes progressChallenges(UserProgressChallengesReq request) {
 
