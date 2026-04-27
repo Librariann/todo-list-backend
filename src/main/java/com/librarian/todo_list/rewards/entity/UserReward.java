@@ -22,6 +22,27 @@ public class UserReward extends BaseEntity {
     @JoinColumn(name = "reward_id", nullable = false)
     private Rewards rewards;
 
+    @Column(nullable = false, length = 50)
+    private String rewardName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private Rewards.RewardsType rewardType;
+
+    @Column(nullable = false)
+    private Integer rewardPoint;
+
+    @Column(nullable = false, length = 50)
+    private String rewardDescription;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean discount = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer discountRate = 0;
+
     @Column(nullable = false)
     @Builder.Default
     private boolean isUsed = false;
