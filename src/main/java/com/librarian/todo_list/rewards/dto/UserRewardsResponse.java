@@ -29,12 +29,12 @@ public class UserRewardsResponse {
                 .id(userReward.getId())
                 .createdAt(userReward.getCreatedAt())
                 .updatedAt(userReward.getUpdatedAt())
-                .name(userReward.getRewards().getName())
-                .type(userReward.getRewards().getType())
-                .point(userReward.getRewards().getPoint())
-                .description(userReward.getRewards().getDescription())
-                .discount(userReward.getRewards().isDiscount())
-                .discountRate(userReward.getRewards().getDiscountRate())
+                .name(userReward.getRewardName())
+                .type(userReward.getRewardType())
+                .point(userReward.getRewardPoint())
+                .description(userReward.getRewardDescription())
+                .discount(userReward.isDiscount())
+                .discountRate(userReward.getDiscountRate())
                 .isUsed(userReward.isUsed())
                 .build();
     }
