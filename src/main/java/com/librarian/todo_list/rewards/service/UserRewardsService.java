@@ -1,10 +1,6 @@
 package com.librarian.todo_list.rewards.service;
 
-import com.librarian.todo_list.exception.CommonAlreadyExistsException;
-import com.librarian.todo_list.rewards.dto.RewardsRegistrationRequest;
-import com.librarian.todo_list.rewards.dto.UserRewardsRegistrationRequest;
 import com.librarian.todo_list.rewards.dto.UserRewardsResponse;
-import com.librarian.todo_list.rewards.dto.RewardsUpdateRequest;
 import com.librarian.todo_list.rewards.entity.Rewards;
 import com.librarian.todo_list.rewards.entity.UserReward;
 import com.librarian.todo_list.rewards.repository.RewardsRepository;
@@ -43,6 +39,12 @@ public class UserRewardsService {
         UserReward userRewards = UserReward.builder()
                 .user(user)
                 .rewards(reward)
+                .rewardName(reward.getName())
+                .rewardType(reward.getType())
+                .rewardPoint(reward.getPoint())
+                .rewardDescription(reward.getDescription())
+                .discount(reward.isDiscount())
+                .discountRate(reward.getDiscountRate())
                 .build();
 
         // 사용자 저장
